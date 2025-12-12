@@ -1,0 +1,52 @@
+# === Android ===
+*.apk
+*.ap_
+*.aab
+*.aar
+*.iml
+
+# Build folders
+/build
+*/build
+out/
+
+# Local configuration
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+
+# Gradle
+.gradle
+gradle-app.setting
+
+# Keystore (rất quan trọng)
+*.keystore
+*.jks
+*.pem
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Android Studio
+captures/
+.externalNativeBuild
+.cxx
+
+# NDK
+obj/
+*.o
+
+# Others
+*.class
+*.zip
+*.7z
+*.bak
+*.tmp
