@@ -1,5 +1,7 @@
 package com.teamforone.quanlysinhvien.data.db;
 
+import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Base64;
 
 import com.teamforone.quanlysinhvien.BuildConfig;
@@ -8,7 +10,35 @@ import java.nio.charset.StandardCharsets;
 
 public final class DatabaseProvider {
 
+    private DatabaseHelper databaseHelper;
+    private static DatabaseProvider instance;
+
     private DatabaseProvider() {}
+
+    private DatabaseProvider(Context context) {
+        databaseHelper = DatabaseHelper.getInstance(context);
+    }
+
+    public static synchronized DatabaseProvider getInstance(Context context) {
+        if (instance == null) {
+            instance = new DatabaseProvider(context.getApplicationContext());
+        }
+        return instance;
+    }
+
+    public SQLiteDatabase getReadableDatabase() {
+        return databaseHelper.getReadableDatabase();
+    }
+
+    public SQLiteDatabase getWritableDatabase() {
+        return databaseHelper.getWritableDatabase();
+    }
+
+    public void close() {
+        if (databaseHelper != null) {
+            databaseHelper.close();
+        }
+    }
 
     /**
      * Lấy path file DB trong assets (ví dụ: "databases/QLSV.db")
