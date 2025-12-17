@@ -104,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
         cardClassManagement.setOnClickListener(v -> startActivity(new Intent(this, QuanLyLopActivity.class)));
         cardSubjectManagement.setOnClickListener(v -> startActivity(new Intent(this, QuanLyMonHocActivity.class)));
         cardTeacherManagement.setOnClickListener(v -> startActivity(new Intent(this, QuanLyGiangVienActivity.class)));
+        // 👉 NÚT BÁO CÁO – THỐNG KÊ
+        cardStatistics.setOnClickListener(
+                v -> startActivity(new Intent(this, ReportActivity.class)));
         // TODO: Thêm các activity khác khi sẵn sàng
         cardLogout.setOnClickListener(v -> showLogoutDialog());
     }
