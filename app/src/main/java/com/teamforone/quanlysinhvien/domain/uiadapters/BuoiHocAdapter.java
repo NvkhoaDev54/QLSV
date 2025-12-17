@@ -16,17 +16,65 @@ import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
 
 import java.util.List;
 
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.teamforone.quanlysinhvien.R;
+import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
+
+import java.util.List;
+
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.teamforone.quanlysinhvien.R;
+import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
+
+import java.util.List;
+
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.teamforone.quanlysinhvien.R;
+import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
+
+import java.util.List;
+
 public class BuoiHocAdapter extends RecyclerView.Adapter<BuoiHocAdapter.ViewHolder> {
 
     private Context context;
     private List<BuoiHoc> buoiHocList;
-    private OnItemClickListener listener;
+    private OnBuoiHocClickListener listener;
 
-    public interface OnItemClickListener {
-        void onDiemDanhClick(BuoiHoc buoiHoc);
+    public interface OnBuoiHocClickListener {
+        void onBuoiHocClick(BuoiHoc buoiHoc);
     }
 
-    public BuoiHocAdapter(Context context, List<BuoiHoc> buoiHocList, OnItemClickListener listener) {
+    public BuoiHocAdapter(Context context, List<BuoiHoc> buoiHocList, OnBuoiHocClickListener listener) {
         this.context = context;
         this.buoiHocList = buoiHocList;
         this.listener = listener;
@@ -43,36 +91,35 @@ public class BuoiHocAdapter extends RecyclerView.Adapter<BuoiHocAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         BuoiHoc buoiHoc = buoiHocList.get(position);
 
-        holder.tvMonHoc.setText(buoiHoc.getTenMonHoc() != null ? buoiHoc.getTenMonHoc() : buoiHoc.getMaMonHoc());
-        holder.tvLop.setText("Lớp: " + (buoiHoc.getTenLop() != null ? buoiHoc.getTenLop() : buoiHoc.getMaLop()));
-        holder.tvGiangVien.setText("GV: " + (buoiHoc.getHoTenGV() != null ? buoiHoc.getHoTenGV() : "Chưa phân công"));
+        // Hiển thị thông tin buổi học (không có giảng viên)
+        holder.tvMonHoc.setText("Môn: " + buoiHoc.getTenMonHoc());
+        holder.tvLop.setText("Lớp: " + buoiHoc.getTenLop());
         holder.tvNgayHoc.setText("Ngày: " + buoiHoc.getNgayHoc());
         holder.tvTiet.setText("Tiết: " + buoiHoc.getTietBatDau() + "-" + buoiHoc.getTietKetThuc());
 
-        holder.btnDiemDanh.setOnClickListener(v -> {
+        holder.cardView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onDiemDanhClick(buoiHoc);
+                listener.onBuoiHocClick(buoiHoc);
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return buoiHocList.size();
+        return buoiHocList != null ? buoiHocList.size() : 0;
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvMonHoc, tvLop, tvGiangVien, tvNgayHoc, tvTiet;
-        ImageButton btnDiemDanh;
+        CardView cardView;
+        TextView tvMonHoc, tvLop, tvNgayHoc, tvTiet;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            cardView = itemView.findViewById(R.id.cardView);
             tvMonHoc = itemView.findViewById(R.id.tvMonHoc);
             tvLop = itemView.findViewById(R.id.tvLop);
-            tvGiangVien = itemView.findViewById(R.id.tvGiangVien);
             tvNgayHoc = itemView.findViewById(R.id.tvNgayHoc);
             tvTiet = itemView.findViewById(R.id.tvTiet);
-            btnDiemDanh = itemView.findViewById(R.id.btnDiemDanh);
         }
     }
 }

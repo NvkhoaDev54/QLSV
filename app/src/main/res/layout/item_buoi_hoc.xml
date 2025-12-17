@@ -1,60 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:padding="16dp">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvMonHoc"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Lập trình Java"
-                android:textSize="18sp"
+                android:layout_weight="1"
+                android:text="Môn: Lập trình Java"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimary" />
-
-            <TextView
-                android:id="@+id/tvLop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lớp: CNTT01"
-                android:textSize="14sp"
-                android:textColor="#666"
-                android:layout_marginTop="4dp" />
-
-            <TextView
-                android:id="@+id/tvGiangVien"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="GV: Nguyễn Văn A"
-                android:textSize="14sp"
-                android:textColor="#666"
-                android:layout_marginTop="2dp" />
-
-            <TextView
-                android:id="@+id/tvNgayHoc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ngày: 15/12/2024"
-                android:textSize="14sp"
-                android:textColor="#333"
-                android:textStyle="bold"
-                android:layout_marginTop="4dp" />
 
             <TextView
                 android:id="@+id/tvTiet"
@@ -62,31 +39,53 @@
                 android:layout_height="wrap_content"
                 android:text="Tiết: 1-3"
                 android:textSize="14sp"
-                android:textColor="#666"
-                android:layout_marginTop="2dp" />
+                android:textColor="#FFFFFF"
+                android:background="@color/colorPrimary"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:layout_marginStart="8dp" />
         </LinearLayout>
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvLop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:text="Lớp: CNTT01"
+            android:textSize="14sp"
+            android:textColor="#666"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@android:drawable/ic_menu_sort_by_size"
+            android:drawablePadding="8dp"
+            android:drawableTint="#666" />
 
-            <ImageButton
-                android:id="@+id/btnDiemDanh"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:src="@drawable/ic_attendance"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="Điểm danh"
-                app:tint="#4CAF50" />
+        <TextView
+            android:id="@+id/tvNgayHoc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ngày: 15/12/2024"
+            android:textSize="14sp"
+            android:textColor="#666"
+            android:layout_marginTop="8dp"
+            android:drawableStart="@android:drawable/ic_menu_my_calendar"
+            android:drawablePadding="8dp"
+            android:drawableTint="#666" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Điểm danh"
-                android:textSize="12sp"
-                android:textColor="#4CAF50" />
-        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E0E0E0"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nhấn để điểm danh →"
+            android:textSize="13sp"
+            android:textColor="@color/colorAccent"
+            android:textStyle="italic"
+            android:layout_gravity="end" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -24,7 +24,8 @@ import java.util.Locale;
 
 public class TaoBuoiHocActivity extends AppCompatActivity {
 
-    private Spinner spinnerMonHoc, spinnerGiangVien, spinnerLop;
+    // ĐÃ XÓA spinnerGiangVien tại đây
+    private Spinner spinnerMonHoc, spinnerLop;
     private Spinner spinnerTietBatDau, spinnerTietKetThuc;
     private EditText etNgayHoc, etGhiChu;
     private Button btnSave, btnCancel;
@@ -48,7 +49,7 @@ public class TaoBuoiHocActivity extends AppCompatActivity {
 
     private void initViews() {
         spinnerMonHoc = findViewById(R.id.spinnerMonHoc);
-        spinnerGiangVien = findViewById(R.id.spinnerGiangVien);
+        // ĐÃ XÓA dòng ánh xạ spinnerGiangVien
         spinnerLop = findViewById(R.id.spinnerLop);
         spinnerTietBatDau = findViewById(R.id.spinnerTietBatDau);
         spinnerTietKetThuc = findViewById(R.id.spinnerTietKetThuc);
@@ -74,7 +75,7 @@ public class TaoBuoiHocActivity extends AppCompatActivity {
     }
 
     private void setupSpinners() {
-        // Spinner Môn học (demo data)
+        // Spinner Môn học
         List<String> monHocList = new ArrayList<>();
         monHocList.add("Chọn môn học");
         monHocList.add("MH001 - Lập trình Java");
@@ -85,19 +86,13 @@ public class TaoBuoiHocActivity extends AppCompatActivity {
         monHocAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerMonHoc.setAdapter(monHocAdapter);
 
-        // Spinner Giảng viên (demo data)
-        List<String> giangVienList = new ArrayList<>();
-        giangVienList.add("Chọn giảng viên");
-        giangVienList.add("GV001 - Nguyễn Văn A");
-        giangVienList.add("GV002 - Trần Thị B");
-        ArrayAdapter<String> giangVienAdapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, giangVienList);
-        giangVienAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerGiangVien.setAdapter(giangVienAdapter);
+        // ĐÃ XÓA toàn bộ đoạn code setup cho spinnerGiangVien tại đây
 
         // Spinner Lớp
         List<String> lopList = sinhVienService.getAllLopNames();
-        lopList.remove(0); // Remove "Tất cả"
+        if (!lopList.isEmpty()) {
+            lopList.remove(0); // Xóa "Tất cả" nếu có
+        }
         lopList.add(0, "Chọn lớp");
         ArrayAdapter<String> lopAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, lopList);
@@ -163,13 +158,12 @@ public class TaoBuoiHocActivity extends AppCompatActivity {
             return;
         }
 
-        // Get data
+        // Lấy dữ liệu
         String monHocStr = spinnerMonHoc.getSelectedItem().toString();
         String maMonHoc = monHocStr.split(" - ")[0];
 
-        String giangVienStr = spinnerGiangVien.getSelectedItemPosition() > 0 ?
-                spinnerGiangVien.getSelectedItem().toString() : "";
-        String maGV = !giangVienStr.isEmpty() ? giangVienStr.split(" - ")[0] : null;
+        // ĐÃ XÓA logic lấy maGV từ Spinner. Gán tạm là null hoặc giá trị mặc định.
+        String maGV = null;
 
         String lopStr = spinnerLop.getSelectedItem().toString();
         String maLop = lopStr.split(" - ")[0];
@@ -177,17 +171,17 @@ public class TaoBuoiHocActivity extends AppCompatActivity {
         String ngayHoc = etNgayHoc.getText().toString();
         String ghiChu = etGhiChu.getText().toString().trim();
 
-        // Create BuoiHoc
+        // Tạo đối tượng BuoiHoc
         BuoiHoc buoiHoc = new BuoiHoc();
         buoiHoc.setMaMonHoc(maMonHoc);
-        buoiHoc.setMaGV(maGV);
+        buoiHoc.setMaGV(maGV); // Vẫn set để tránh lỗi logic, nhưng giá trị là null
         buoiHoc.setMaLop(maLop);
         buoiHoc.setNgayHoc(ngayHoc);
         buoiHoc.setTietBatDau(tietBatDau);
         buoiHoc.setTietKetThuc(tietKetThuc);
         buoiHoc.setGhiChu(ghiChu);
 
-        // Save
+        // Lưu vào Database qua Service
         if (buoiHocService.createBuoiHoc(buoiHoc)) {
             Toast.makeText(this, "Tạo buổi học thành công", Toast.LENGTH_SHORT).show();
             finish();

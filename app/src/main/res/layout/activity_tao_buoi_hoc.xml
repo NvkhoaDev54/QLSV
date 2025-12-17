@@ -53,20 +53,7 @@
                         android:layout_marginTop="8dp"
                         android:background="@drawable/spinner_background" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:text="Giảng viên"
-                        android:textSize="14sp"
-                        android:textColor="#666" />
-
-                    <Spinner
-                        android:id="@+id/spinnerGiangVien"
-                        android:layout_width="match_parent"
-                        android:layout_height="48dp"
-                        android:layout_marginTop="8dp"
-                        android:background="@drawable/spinner_background" />
+                    <!-- MỤC GIẢNG VIÊN ĐÃ ĐƯỢC XÓA TẠI ĐÂY -->
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -137,7 +124,6 @@
                             android:layout_weight="1"
                             android:background="@drawable/spinner_background" />
                     </LinearLayout>
-
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
