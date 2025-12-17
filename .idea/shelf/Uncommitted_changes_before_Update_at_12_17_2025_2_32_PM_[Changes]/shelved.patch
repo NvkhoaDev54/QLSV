@@ -1,0 +1,2295 @@
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    package=\"com.teamforone.quanlysinhvien\">\r\n\r\n    <application\r\n        android:allowBackup=\"true\"\r\n        android:icon=\"@mipmap/ic_launcher\"\r\n        android:label=\"Quản Lý Sinh Viên\"\r\n        android:roundIcon=\"@mipmap/ic_launcher_round\"\r\n        android:supportsRtl=\"true\"\r\n        android:theme=\"@style/AppTheme\">\r\n\r\n        <!-- Main Activity - Màn hình chính với menu -->\r\n        <activity\r\n            android:name=\".ui.MainActivity\"\r\n            android:exported=\"true\"\r\n            android:label=\"Quản Lý Sinh Viên\">\r\n            <intent-filter>\r\n                <action android:name=\"android.intent.action.MAIN\" />\r\n                <category android:name=\"android.intent.category.LAUNCHER\" />\r\n            </intent-filter>\r\n        </activity>\r\n\r\n        <activity\r\n            android:name=\".ui.QuanLySinhVien\"\r\n            android:label=\"Danh Sách Sinh Viên\"\r\n            android:parentActivityName=\".ui.MainActivity\"\r\n            android:exported=\"false\" />\r\n\r\n        <!-- Add Student -->\r\n        <activity\r\n            android:name=\".ui.AddSinhVienActivity\"\r\n            android:label=\"Thêm Sinh Viên\"\r\n            android:parentActivityName=\".ui.QuanLySinhVien\"\r\n            android:exported=\"false\" />\r\n\r\n        <!-- Edit Student -->\r\n        <activity\r\n            android:name=\".ui.EditSinhVienActivity\"\r\n            android:label=\"Cập Nhật Sinh Viên\"\r\n            android:parentActivityName=\".ui.QuanLySinhVien\"\r\n            android:exported=\"false\" />\r\n\r\n        <!-- Các Activity khác (thêm sau khi tạo) -->\r\n        <!--\r\n        <activity\r\n            android:name=\".ui.AttendanceActivity\"\r\n            android:label=\"Điểm Danh\"\r\n            android:parentActivityName=\".ui.MainActivity\" />\r\n\r\n        <activity\r\n            android:name=\".ui.ClassManagementActivity\"\r\n            android:label=\"Quản Lý Lớp\"\r\n            android:parentActivityName=\".ui.MainActivity\" />\r\n\r\n        <activity\r\n            android:name=\".ui.SubjectManagementActivity\"\r\n            android:label=\"Quản Lý Môn Học\"\r\n            android:parentActivityName=\". ui.MainActivity\" />\r\n\r\n        <activity\r\n            android:name=\". ui.TeacherManagementActivity\"\r\n            android:label=\"Quản Lý Giảng Viên\"\r\n            android:parentActivityName=\".ui.MainActivity\" />\r\n\r\n        <activity\r\n            android:name=\".ui.AccountManagementActivity\"\r\n            android:label=\"Quản Lý Tài Khoản\"\r\n            android:parentActivityName=\".ui.MainActivity\" />\r\n\r\n        <activity\r\n            android:name=\".ui.StatisticsActivity\"\r\n            android:label=\"Thống Kê Báo Cáo\"\r\n            android:parentActivityName=\". ui.MainActivity\" />\r\n        -->\r\n\r\n    </application>\r\n\r\n</manifest>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml
+--- a/app/src/main/AndroidManifest.xml	(revision a08476ad09181e0294dedb0af0fa19a82f44f563)
++++ b/app/src/main/AndroidManifest.xml	(date 1765956048767)
+@@ -10,6 +10,8 @@
+         android:supportsRtl="true"
+         android:theme="@style/AppTheme">
+ 
++
++
+         <!-- Main Activity - Màn hình chính với menu -->
+         <activity
+             android:name=".ui.MainActivity"
+@@ -41,6 +43,8 @@
+             android:parentActivityName=".ui.QuanLySinhVien"
+             android:exported="false" />
+ 
++
++
+         <!-- Các Activity khác (thêm sau khi tạo) -->
+         <!--
+         <activity
+Index: app/src/main/java/com/teamforone/quanlysinhvien/ui/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.teamforone.quanlysinhvien.ui;\r\n\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.activity.OnBackPressedCallback;\r\nimport androidx.appcompat.app.AlertDialog;\r\nimport androidx.appcompat.app. AppCompatActivity;\r\nimport androidx.cardview.widget.CardView;\r\n\r\nimport com.teamforone.quanlysinhvien.R;\r\nimport com.teamforone.quanlysinhvien.ui.QuanLySinhVien;\r\n\r\npublic class MainActivity extends AppCompatActivity {\r\n\r\n    private CardView cardStudentManagement, cardAttendance, cardClassManagement;\r\n    private CardView cardSubjectManagement, cardTeacherManagement, cardAccountManagement;\r\n    private CardView cardStatistics, cardLogout;\r\n    private TextView tvWelcome;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_main);\r\n\r\n        // Khởi tạo views\r\n        initViews();\r\n\r\n        // Lấy thông tin người dùng (nếu có từ Intent hoặc SharedPreferences)\r\n        String username = getIntent().getStringExtra(\"username\");\r\n        if (username != null && !username.isEmpty()) {\r\n            tvWelcome.setText(\"Xin chào, \" + username);\r\n        }\r\n\r\n        // Thiết lập sự kiện click cho các card\r\n        setupClickListeners();\r\n        getOnBackPressedDispatcher().addCallback(this,\r\n                new OnBackPressedCallback(true) {\r\n                    @Override\r\n                    public void handleOnBackPressed() {\r\n                        showExitDialog();\r\n                    }\r\n                });\r\n    }\r\n\r\n    private void initViews() {\r\n        tvWelcome = findViewById(R. id.tvWelcome);\r\n        cardStudentManagement = findViewById(R.id.cardStudentManagement);\r\n        cardAttendance = findViewById(R.id. cardAttendance);\r\n        cardClassManagement = findViewById(R. id.cardClassManagement);\r\n        cardSubjectManagement = findViewById(R.id.cardSubjectManagement);\r\n        cardTeacherManagement = findViewById(R. id.cardTeacherManagement);\r\n        cardAccountManagement = findViewById(R.id.cardAccountManagement);\r\n        cardStatistics = findViewById(R.id.cardStatistics);\r\n        cardLogout = findViewById(R.id.cardLogout);\r\n    }\r\n\r\n    private void setupClickListeners() {\r\n        // Quản lý sinh viên\r\n        cardStudentManagement.setOnClickListener(v -> {\r\n            Intent intent = new Intent(MainActivity.this, QuanLySinhVien.class);\r\n            startActivity(intent);\r\n        });\r\n\r\n//        // Điểm danh\r\n//        cardAttendance. setOnClickListener(v -> {\r\n//            Intent intent = new Intent(MainActivity.this, AttendanceActivity.class);\r\n//            startActivity(intent);\r\n//        });\r\n//\r\n//        // Quản lý lớp\r\n//        cardClassManagement.setOnClickListener(v -> {\r\n//            Intent intent = new Intent(MainActivity.this, ClassManagementActivity.class);\r\n//            startActivity(intent);\r\n//        });\r\n//\r\n//        // Quản lý môn học\r\n//        cardSubjectManagement. setOnClickListener(v -> {\r\n//            Intent intent = new Intent(MainActivity.this, SubjectManagementActivity.class);\r\n//            startActivity(intent);\r\n//        });\r\n//\r\n//        // Quản lý giảng viên\r\n//        cardTeacherManagement.setOnClickListener(v -> {\r\n//            Intent intent = new Intent(MainActivity.this, TeacherManagementActivity.class);\r\n//            startActivity(intent);\r\n//        });\r\n//\r\n//        // Quản lý tài khoản - phân quyền\r\n//        cardAccountManagement.setOnClickListener(v -> {\r\n//            Intent intent = new Intent(MainActivity.this, AccountManagementActivity.class);\r\n//            startActivity(intent);\r\n//        });\r\n//\r\n//        // Thống kê báo cáo\r\n//        cardStatistics.setOnClickListener(v -> {\r\n//            Intent intent = new Intent(MainActivity.this, StatisticsActivity.class);\r\n//            startActivity(intent);\r\n//        });\r\n\r\n        // Đăng xuất\r\n        cardLogout.setOnClickListener(v -> {\r\n            // Hiển thị dialog xác nhận đăng xuất\r\n            showLogoutDialog();\r\n        });\r\n    }\r\n\r\n    private void showLogoutDialog() {\r\n        new androidx.appcompat.app.AlertDialog.Builder(this)\r\n                .setTitle(\"Đăng xuất\")\r\n                .setMessage(\"Bạn có chắc chắn muốn đăng xuất? \")\r\n                .setPositiveButton(\"Có\", (dialog, which) -> {\r\n                    // Xóa thông tin đăng nhập (SharedPreferences)\r\n                    // SharedPreferences prefs = getSharedPreferences(\"UserPrefs\", MODE_PRIVATE);\r\n                    // prefs.edit().clear().apply();\r\n\r\n                    Toast.makeText(MainActivity.this, \"Đã đăng xuất\", Toast.LENGTH_SHORT).show();\r\n\r\n//                    // Chuyển về màn hình đăng nhập\r\n//                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);\r\n//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent. FLAG_ACTIVITY_CLEAR_TASK);\r\n//                    startActivity(intent);\r\n//                    finish();\r\n                })\r\n                .setNegativeButton(\"Không\", null)\r\n                .show();\r\n    }\r\n\r\n    private void showExitDialog() {\r\n        new AlertDialog.Builder(this)\r\n                .setTitle(\"Thoát ứng dụng\")\r\n                .setMessage(\"Bạn có muốn thoát ứng dụng?\")\r\n                .setPositiveButton(\"Có\", (dialog, which) -> {\r\n                    finishAffinity(); // Đóng toàn bộ Activity\r\n                })\r\n                .setNegativeButton(\"Không\", null)\r\n                .show();\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/ui/MainActivity.java b/app/src/main/java/com/teamforone/quanlysinhvien/ui/MainActivity.java
+--- a/app/src/main/java/com/teamforone/quanlysinhvien/ui/MainActivity.java	(revision a08476ad09181e0294dedb0af0fa19a82f44f563)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/ui/MainActivity.java	(date 1765956742750)
+@@ -46,7 +46,7 @@
+     }
+ 
+     private void initViews() {
+-        tvWelcome = findViewById(R. id.tvWelcome);
++        tvWelcome = findViewById(R.id.tvWelcome);
+         cardStudentManagement = findViewById(R.id.cardStudentManagement);
+         cardAttendance = findViewById(R.id. cardAttendance);
+         cardClassManagement = findViewById(R. id.cardClassManagement);
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/model/DiemDanh.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/model/DiemDanh.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/model/DiemDanh.java
+new file mode 100644
+--- /dev/null	(date 1765954256361)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/model/DiemDanh.java	(date 1765954256361)
+@@ -0,0 +1,50 @@
++package com.teamforone.quanlysinhvien.domain.model;
++
++public class DiemDanh {
++    private int id;
++    private int buoiHocId;
++    private String maSV;
++    private String hoTenSV;
++    private boolean coMat;
++    private String ghiChu;
++
++    public DiemDanh() {}
++
++    public DiemDanh(int id, int buoiHocId, String maSV, String hoTenSV,
++                    boolean coMat, String ghiChu) {
++        this.id = id;
++        this.buoiHocId = buoiHocId;
++        this.maSV = maSV;
++        this.hoTenSV = hoTenSV;
++        this.coMat = coMat;
++        this.ghiChu = ghiChu;
++    }
++
++    public int getId() { return id; }
++    public void setId(int id) { this.id = id; }
++
++    public int getBuoiHocId() { return buoiHocId; }
++    public void setBuoiHocId(int buoiHocId) { this.buoiHocId = buoiHocId; }
++
++    public String getMaSV() { return maSV; }
++    public void setMaSV(String maSV) { this.maSV = maSV; }
++
++    public String getHoTenSV() { return hoTenSV; }
++    public void setHoTenSV(String hoTenSV) { this.hoTenSV = hoTenSV; }
++
++    public boolean isCoMat() { return coMat; }
++    public void setCoMat(boolean coMat) { this.coMat = coMat; }
++
++    public String getGhiChu() { return ghiChu; }
++    public void setGhiChu(String ghiChu) { this.ghiChu = ghiChu; }
++
++    @Override
++    public String toString() {
++        return "DiemDanh{" +
++                "id=" + id +
++                ", maSV='" + maSV + '\'' +
++                ", hoTenSV='" + hoTenSV + '\'' +
++                ", coMat=" + coMat +
++                '}';
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/model/BuoiHoc.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/model/BuoiHoc.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/model/BuoiHoc.java
+new file mode 100644
+--- /dev/null	(date 1765954241259)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/model/BuoiHoc.java	(date 1765954241259)
+@@ -0,0 +1,77 @@
++package com.teamforone.quanlysinhvien.domain.model;
++
++public class BuoiHoc {
++    private int id;
++    private String maMonHoc;
++    private String tenMonHoc;
++    private String maGV;
++    private String hoTenGV;
++    private String maLop;
++    private String tenLop;
++    private String ngayHoc;
++    private int tietBatDau;
++    private int tietKetThuc;
++    private String ghiChu;
++
++    public BuoiHoc() {}
++
++    public BuoiHoc(int id, String maMonHoc, String tenMonHoc, String maGV,
++                   String hoTenGV, String maLop, String tenLop, String ngayHoc,
++                   int tietBatDau, int tietKetThuc, String ghiChu) {
++        this.id = id;
++        this.maMonHoc = maMonHoc;
++        this.tenMonHoc = tenMonHoc;
++        this.maGV = maGV;
++        this.hoTenGV = hoTenGV;
++        this.maLop = maLop;
++        this.tenLop = tenLop;
++        this.ngayHoc = ngayHoc;
++        this.tietBatDau = tietBatDau;
++        this.tietKetThuc = tietKetThuc;
++        this.ghiChu = ghiChu;
++    }
++
++    public int getId() { return id; }
++    public void setId(int id) { this.id = id; }
++
++    public String getMaMonHoc() { return maMonHoc; }
++    public void setMaMonHoc(String maMonHoc) { this.maMonHoc = maMonHoc; }
++
++    public String getTenMonHoc() { return tenMonHoc; }
++    public void setTenMonHoc(String tenMonHoc) { this.tenMonHoc = tenMonHoc; }
++
++    public String getMaGV() { return maGV; }
++    public void setMaGV(String maGV) { this.maGV = maGV; }
++
++    public String getHoTenGV() { return hoTenGV; }
++    public void setHoTenGV(String hoTenGV) { this.hoTenGV = hoTenGV; }
++
++    public String getMaLop() { return maLop; }
++    public void setMaLop(String maLop) { this.maLop = maLop; }
++
++    public String getTenLop() { return tenLop; }
++    public void setTenLop(String tenLop) { this.tenLop = tenLop; }
++
++    public String getNgayHoc() { return ngayHoc; }
++    public void setNgayHoc(String ngayHoc) { this.ngayHoc = ngayHoc; }
++
++    public int getTietBatDau() { return tietBatDau; }
++    public void setTietBatDau(int tietBatDau) { this.tietBatDau = tietBatDau; }
++
++    public int getTietKetThuc() { return tietKetThuc; }
++    public void setTietKetThuc(int tietKetThuc) { this.tietKetThuc = tietKetThuc; }
++
++    public String getGhiChu() { return ghiChu; }
++    public void setGhiChu(String ghiChu) { this.ghiChu = ghiChu; }
++
++    @Override
++    public String toString() {
++        return "BuoiHoc{" +
++                "id=" + id +
++                ", maMonHoc='" + maMonHoc + '\'' +
++                ", tenMonHoc='" + tenMonHoc + '\'' +
++                ", ngayHoc='" + ngayHoc + '\'' +
++                ", tiet=" + tietBatDau + "-" + tietKetThuc +
++                '}';
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/CreateBuoiHocUseCase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/CreateBuoiHocUseCase.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/CreateBuoiHocUseCase.java
+new file mode 100644
+--- /dev/null	(date 1765954369763)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/CreateBuoiHocUseCase.java	(date 1765954369763)
+@@ -0,0 +1,40 @@
++package com.teamforone.quanlysinhvien.domain.usecase;
++
++import com.teamforone.quanlysinhvien.data.dao.BuoiHocDAO;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++
++public class CreateBuoiHocUseCase {
++    private BuoiHocDAO buoiHocDAO;
++
++    public CreateBuoiHocUseCase(BuoiHocDAO buoiHocDAO) {
++        this.buoiHocDAO = buoiHocDAO;
++    }
++
++    public boolean execute(BuoiHoc buoiHoc) {
++        if (buoiHoc == null) {
++            return false;
++        }
++
++        if (buoiHoc.getMaMonHoc() == null || buoiHoc.getMaMonHoc().trim().isEmpty()) {
++            return false;
++        }
++
++        if (buoiHoc.getMaLop() == null || buoiHoc.getMaLop().trim().isEmpty()) {
++            return false;
++        }
++
++        if (buoiHoc.getNgayHoc() == null || buoiHoc.getNgayHoc().trim().isEmpty()) {
++            return false;
++        }
++
++        if (buoiHoc.getTietBatDau() <= 0 || buoiHoc.getTietKetThuc() <= 0) {
++            return false;
++        }
++
++        if (buoiHoc.getTietBatDau() > buoiHoc.getTietKetThuc()) {
++            return false;
++        }
++
++        return buoiHocDAO.insert(buoiHoc);
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/data/dao/DiemDanhDAO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/data/dao/DiemDanhDAO.java b/app/src/main/java/com/teamforone/quanlysinhvien/data/dao/DiemDanhDAO.java
+new file mode 100644
+--- /dev/null	(date 1765954212489)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/data/dao/DiemDanhDAO.java	(date 1765954212489)
+@@ -0,0 +1,141 @@
++package com.teamforone.quanlysinhvien.data.dao;
++
++import android.content.ContentValues;
++import android.content.Context;
++import android.database.Cursor;
++import android.database.sqlite.SQLiteDatabase;
++
++import com.teamforone.quanlysinhvien.data.db.DatabaseProvider;
++import com.teamforone.quanlysinhvien.domain.model.DiemDanh;
++import com.teamforone.quanlysinhvien.util.AppLogger;
++
++import java.util.ArrayList;
++import java.util.List;
++
++public class DiemDanhDAO {
++    private DatabaseProvider databaseProvider;
++
++    public DiemDanhDAO(Context context) {
++        databaseProvider = DatabaseProvider.getInstance(context);
++    }
++
++    public boolean insert(DiemDanh diemDanh) {
++        SQLiteDatabase db = databaseProvider.getWritableDatabase();
++        try {
++            ContentValues values = new ContentValues();
++            values.put("buoiHocId", diemDanh.getBuoiHocId());
++            values.put("maSV", diemDanh.getMaSV());
++            values.put("coMat", diemDanh.isCoMat() ? 1 : 0);
++            values.put("ghiChu", diemDanh.getGhiChu());
++
++            long result = db.insert("DIEM_DANH", null, values);
++            if (result != -1) {
++                AppLogger.d("DiemDanhDAO", "Inserted: " + diemDanh);
++                return true;
++            }
++        } catch (Exception e) {
++            AppLogger.e("DiemDanhDAO", "Error inserting diem danh", e);
++        }
++        return false;
++    }
++
++    public boolean update(DiemDanh diemDanh) {
++        SQLiteDatabase db = databaseProvider.getWritableDatabase();
++        try {
++            ContentValues values = new ContentValues();
++            values.put("coMat", diemDanh.isCoMat() ? 1 : 0);
++            values.put("ghiChu", diemDanh.getGhiChu());
++
++            int result = db.update("DIEM_DANH", values, "id = ?",
++                    new String[]{String.valueOf(diemDanh.getId())});
++            if (result > 0) {
++                AppLogger.d("DiemDanhDAO", "Updated: " + diemDanh);
++                return true;
++            }
++        } catch (Exception e) {
++            AppLogger.e("DiemDanhDAO", "Error updating diem danh", e);
++        }
++        return false;
++    }
++
++    public boolean delete(int id) {
++        SQLiteDatabase db = databaseProvider.getWritableDatabase();
++        try {
++            int result = db.delete("DIEM_DANH", "id = ?",
++                    new String[]{String.valueOf(id)});
++            if (result > 0) {
++                AppLogger.d("DiemDanhDAO", "Deleted diem danh: " + id);
++                return true;
++            }
++        } catch (Exception e) {
++            AppLogger.e("DiemDanhDAO", "Error deleting diem danh", e);
++        }
++        return false;
++    }
++
++    public List<DiemDanh> getByBuoiHoc(int buoiHocId) {
++        List<DiemDanh> list = new ArrayList<>();
++        SQLiteDatabase db = databaseProvider.getReadableDatabase();
++
++        String query = "SELECT d.*, s.hoTen " +
++                "FROM DIEM_DANH d " +
++                "LEFT JOIN SINHVIEN s ON d.maSV = s.maSV " +
++                "WHERE d.buoiHocId = ? " +
++                "ORDER BY s.hoTen";
++
++        Cursor cursor = null;
++        try {
++            cursor = db.rawQuery(query, new String[]{String.valueOf(buoiHocId)});
++            if (cursor.moveToFirst()) {
++                do {
++                    list.add(extractDiemDanhFromCursor(cursor));
++                } while (cursor.moveToNext());
++            }
++            AppLogger.d("DiemDanhDAO", "Retrieved " + list.size() + " diem danh records");
++        } catch (Exception e) {
++            AppLogger.e("DiemDanhDAO", "Error getting diem danh", e);
++        } finally {
++            if (cursor != null) cursor.close();
++        }
++        return list;
++    }
++
++    public boolean exists(int buoiHocId, String maSV) {
++        SQLiteDatabase db = databaseProvider.getReadableDatabase();
++        Cursor cursor = null;
++        try {
++            cursor = db.rawQuery("SELECT 1 FROM DIEM_DANH WHERE buoiHocId = ? AND maSV = ?",
++                    new String[]{String.valueOf(buoiHocId), maSV});
++            return cursor.getCount() > 0;
++        } catch (Exception e) {
++            AppLogger.e("DiemDanhDAO", "Error checking existence", e);
++        } finally {
++            if (cursor != null) cursor.close();
++        }
++        return false;
++    }
++
++    public boolean deleteByBuoiHoc(int buoiHocId) {
++        SQLiteDatabase db = databaseProvider.getWritableDatabase();
++        try {
++            int result = db.delete("DIEM_DANH", "buoiHocId = ?",
++                    new String[]{String.valueOf(buoiHocId)});
++            AppLogger.d("DiemDanhDAO", "Deleted " + result + " records for buoi hoc: " + buoiHocId);
++            return true;
++        } catch (Exception e) {
++            AppLogger.e("DiemDanhDAO", "Error deleting by buoi hoc", e);
++        }
++        return false;
++    }
++
++    private DiemDanh extractDiemDanhFromCursor(Cursor cursor) {
++        DiemDanh dd = new DiemDanh();
++        dd.setId(cursor.getInt(0));
++        dd.setBuoiHocId(cursor.getInt(1));
++        dd.setMaSV(cursor.getString(2));
++        dd.setCoMat(cursor.getInt(3) == 1);
++        dd.setGhiChu(cursor.getString(4));
++        dd.setHoTenSV(cursor.getString(5));
++        return dd;
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/data/dao/BuoiHocDAO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/data/dao/BuoiHocDAO.java b/app/src/main/java/com/teamforone/quanlysinhvien/data/dao/BuoiHocDAO.java
+new file mode 100644
+--- /dev/null	(date 1765954041090)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/data/dao/BuoiHocDAO.java	(date 1765954041090)
+@@ -0,0 +1,179 @@
++package com.teamforone.quanlysinhvien.data.dao;
++
++
++import android.content.ContentValues;
++import android.content.Context;
++import android.database.Cursor;
++import android.database.sqlite.SQLiteDatabase;
++
++import com.teamforone.quanlysinhvien.data.db.DatabaseProvider;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++import com.teamforone.quanlysinhvien.util.AppLogger;
++
++import java.util.ArrayList;
++import java.util.List;
++
++public class BuoiHocDAO {
++    private DatabaseProvider databaseProvider;
++
++    public BuoiHocDAO(Context context) {
++        databaseProvider = DatabaseProvider.getInstance(context);
++    }
++
++    public boolean insert(BuoiHoc buoiHoc) {
++        SQLiteDatabase db = databaseProvider.getWritableDatabase();
++        try {
++            ContentValues values = new ContentValues();
++            values.put("maMonHoc", buoiHoc.getMaMonHoc());
++            values.put("maGV", buoiHoc.getMaGV());
++            values.put("maLop", buoiHoc.getMaLop());
++            values.put("ngayHoc", buoiHoc.getNgayHoc());
++            values.put("tietBatDau", buoiHoc.getTietBatDau());
++            values.put("tietKetThuc", buoiHoc.getTietKetThuc());
++            values.put("ghiChu", buoiHoc.getGhiChu());
++
++            long result = db.insert("BUOI_HOC", null, values);
++            if (result != -1) {
++                AppLogger.d("BuoiHocDAO", "Inserted: " + buoiHoc);
++                return true;
++            }
++        } catch (Exception e) {
++            AppLogger.e("BuoiHocDAO", "Error inserting buoi hoc", e);
++        }
++        return false;
++    }
++
++    public boolean update(BuoiHoc buoiHoc) {
++        SQLiteDatabase db = databaseProvider.getWritableDatabase();
++        try {
++            ContentValues values = new ContentValues();
++            values.put("maMonHoc", buoiHoc.getMaMonHoc());
++            values.put("maGV", buoiHoc.getMaGV());
++            values.put("maLop", buoiHoc.getMaLop());
++            values.put("ngayHoc", buoiHoc.getNgayHoc());
++            values.put("tietBatDau", buoiHoc.getTietBatDau());
++            values.put("tietKetThuc", buoiHoc.getTietKetThuc());
++            values.put("ghiChu", buoiHoc.getGhiChu());
++
++            int result = db.update("BUOI_HOC", values, "id = ?",
++                    new String[]{String.valueOf(buoiHoc.getId())});
++            if (result > 0) {
++                AppLogger.d("BuoiHocDAO", "Updated: " + buoiHoc);
++                return true;
++            }
++        } catch (Exception e) {
++            AppLogger.e("BuoiHocDAO", "Error updating buoi hoc", e);
++        }
++        return false;
++    }
++
++    public boolean delete(int id) {
++        SQLiteDatabase db = databaseProvider.getWritableDatabase();
++        try {
++            int result = db.delete("BUOI_HOC", "id = ?",
++                    new String[]{String.valueOf(id)});
++            if (result > 0) {
++                AppLogger.d("BuoiHocDAO", "Deleted buoi hoc: " + id);
++                return true;
++            }
++        } catch (Exception e) {
++            AppLogger.e("BuoiHocDAO", "Error deleting buoi hoc", e);
++        }
++        return false;
++    }
++
++    public List<BuoiHoc> getAll() {
++        List<BuoiHoc> list = new ArrayList<>();
++        SQLiteDatabase db = databaseProvider.getReadableDatabase();
++
++        String query = "SELECT b.*, m.tenMonHoc, g.hoTen as hoTenGV, l.tenLop " +
++                "FROM BUOI_HOC b " +
++                "LEFT JOIN MONHOC m ON b.maMonHoc = m.maMonHoc " +
++                "LEFT JOIN GIANGVIEN g ON b.maGV = g.maGV " +
++                "LEFT JOIN LOP l ON b.maLop = l.maLop " +
++                "ORDER BY b.ngayHoc DESC, b.tietBatDau";
++
++        Cursor cursor = null;
++        try {
++            cursor = db.rawQuery(query, null);
++            if (cursor.moveToFirst()) {
++                do {
++                    list.add(extractBuoiHocFromCursor(cursor));
++                } while (cursor.moveToNext());
++            }
++            AppLogger.d("BuoiHocDAO", "Retrieved " + list.size() + " buoi hoc");
++        } catch (Exception e) {
++            AppLogger.e("BuoiHocDAO", "Error getting all buoi hoc", e);
++        } finally {
++            if (cursor != null) cursor.close();
++        }
++        return list;
++    }
++
++    public List<BuoiHoc> getByLop(String maLop) {
++        List<BuoiHoc> list = new ArrayList<>();
++        SQLiteDatabase db = databaseProvider.getReadableDatabase();
++
++        String query = "SELECT b.*, m.tenMonHoc, g.hoTen as hoTenGV, l.tenLop " +
++                "FROM BUOI_HOC b " +
++                "LEFT JOIN MONHOC m ON b.maMonHoc = m.maMonHoc " +
++                "LEFT JOIN GIANGVIEN g ON b.maGV = g.maGV " +
++                "LEFT JOIN LOP l ON b.maLop = l.maLop " +
++                "WHERE b.maLop = ? " +
++                "ORDER BY b.ngayHoc DESC, b.tietBatDau";
++
++        Cursor cursor = null;
++        try {
++            cursor = db.rawQuery(query, new String[]{maLop});
++            if (cursor.moveToFirst()) {
++                do {
++                    list.add(extractBuoiHocFromCursor(cursor));
++                } while (cursor.moveToNext());
++            }
++        } catch (Exception e) {
++            AppLogger.e("BuoiHocDAO", "Error getting buoi hoc by lop", e);
++        } finally {
++            if (cursor != null) cursor.close();
++        }
++        return list;
++    }
++
++    public BuoiHoc getById(int id) {
++        SQLiteDatabase db = databaseProvider.getReadableDatabase();
++        String query = "SELECT b.*, m.tenMonHoc, g.hoTen as hoTenGV, l.tenLop " +
++                "FROM BUOI_HOC b " +
++                "LEFT JOIN MONHOC m ON b.maMonHoc = m.maMonHoc " +
++                "LEFT JOIN GIANGVIEN g ON b.maGV = g.maGV " +
++                "LEFT JOIN LOP l ON b.maLop = l.maLop " +
++                "WHERE b.id = ?";
++
++        Cursor cursor = null;
++        try {
++            cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
++            if (cursor.moveToFirst()) {
++                return extractBuoiHocFromCursor(cursor);
++            }
++        } catch (Exception e) {
++            AppLogger.e("BuoiHocDAO", "Error getting buoi hoc by id", e);
++        } finally {
++            if (cursor != null) cursor.close();
++        }
++        return null;
++    }
++
++    private BuoiHoc extractBuoiHocFromCursor(Cursor cursor) {
++        BuoiHoc bh = new BuoiHoc();
++        bh.setId(cursor.getInt(0));
++        bh.setMaMonHoc(cursor.getString(1));
++        bh.setMaGV(cursor.getString(2));
++        bh.setMaLop(cursor.getString(3));
++        bh.setNgayHoc(cursor.getString(4));
++        bh.setTietBatDau(cursor.getInt(5));
++        bh.setTietKetThuc(cursor.getInt(6));
++        bh.setGhiChu(cursor.getString(7));
++        bh.setTenMonHoc(cursor.getString(8));
++        bh.setHoTenGV(cursor.getString(9));
++        bh.setTenLop(cursor.getString(10));
++        return bh;
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/ui/DiemDanhActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/ui/DiemDanhActivity.java b/app/src/main/java/com/teamforone/quanlysinhvien/ui/DiemDanhActivity.java
+new file mode 100644
+--- /dev/null	(date 1765954946924)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/ui/DiemDanhActivity.java	(date 1765954946924)
+@@ -0,0 +1,202 @@
++package com.teamforone.quanlysinhvien.ui;
++
++import android.os.Bundle;
++import android.widget.Button;
++import android.widget.TextView;
++import android.widget.Toast;
++
++import androidx.appcompat.app.AppCompatActivity;
++import androidx.appcompat.widget.Toolbar;
++import androidx.recyclerview.widget.LinearLayoutManager;
++import androidx.recyclerview.widget.RecyclerView;
++
++import com.teamforone.quanlysinhvien.R;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++import com.teamforone.quanlysinhvien.domain.model.DiemDanh;
++import com.teamforone.quanlysinhvien.domain.model.SinhVien;
++import com.teamforone.quanlysinhvien.domain.uiadapters.DiemDanhAdapter;
++import com.teamforone.quanlysinhvien.service.BuoiHocService;
++import com.teamforone.quanlysinhvien.service.DiemDanhService;
++import com.teamforone.quanlysinhvien.service.SinhVienService;
++
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++public class DiemDanhActivity extends AppCompatActivity {
++
++    private TextView tvMonHoc, tvLop, tvNgayHoc, tvTiet;
++    private TextView tvCoMat, tvVang;
++    private RecyclerView recyclerView;
++    private Button btnSave, btnDiemDanhTatCa, btnVangTatCa;
++
++    private BuoiHocService buoiHocService;
++    private DiemDanhService diemDanhService;
++    private SinhVienService sinhVienService;
++
++    private DiemDanhAdapter adapter;
++    private List<SinhVien> sinhVienList;
++    private Map<String, DiemDanh> diemDanhMap;
++    private BuoiHoc buoiHoc;
++    private int buoiHocId;
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_diem_danh);
++
++        buoiHocId = getIntent().getIntExtra("BUOI_HOC_ID", -1);
++        if (buoiHocId == -1) {
++            Toast.makeText(this, "Lỗi: Không tìm thấy buổi học", Toast.LENGTH_SHORT).show();
++            finish();
++            return;
++        }
++
++        initViews();
++        initServices();
++        setupToolbar();
++        loadBuoiHoc();
++        setupRecyclerView();
++        setupButtons();
++        loadDiemDanh();
++    }
++
++    private void initViews() {
++        tvMonHoc = findViewById(R.id.tvMonHoc);
++        tvLop = findViewById(R.id.tvLop);
++        tvNgayHoc = findViewById(R.id.tvNgayHoc);
++        tvTiet = findViewById(R.id.tvTiet);
++        tvCoMat = findViewById(R.id.tvCoMat);
++        tvVang = findViewById(R.id.tvVang);
++        recyclerView = findViewById(R.id.recyclerView);
++        btnSave = findViewById(R.id.btnSave);
++        btnDiemDanhTatCa = findViewById(R.id.btnDiemDanhTatCa);
++        btnVangTatCa = findViewById(R.id.btnVangTatCa);
++    }
++
++    private void initServices() {
++        buoiHocService = BuoiHocService.getInstance(this);
++        diemDanhService = DiemDanhService.getInstance(this);
++        sinhVienService = SinhVienService.getInstance(this);
++    }
++
++    private void setupToolbar() {
++        Toolbar toolbar = findViewById(R.id.toolbar);
++        setSupportActionBar(toolbar);
++        if (getSupportActionBar() != null) {
++            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
++        }
++        toolbar.setNavigationOnClickListener(v -> onBackPressed());
++    }
++
++    private void loadBuoiHoc() {
++        buoiHoc = buoiHocService.getBuoiHocById(buoiHocId);
++        if (buoiHoc == null) {
++            Toast.makeText(this, "Không tìm thấy thông tin buổi học", Toast.LENGTH_SHORT).show();
++            finish();
++            return;
++        }
++
++        tvMonHoc.setText("Môn học: " + (buoiHoc.getTenMonHoc() != null ?
++                buoiHoc.getTenMonHoc() : buoiHoc.getMaMonHoc()));
++        tvLop.setText("Lớp: " + (buoiHoc.getTenLop() != null ?
++                buoiHoc.getTenLop() : buoiHoc.getMaLop()));
++        tvNgayHoc.setText("Ngày: " + buoiHoc.getNgayHoc());
++        tvTiet.setText("Tiết: " + buoiHoc.getTietBatDau() + "-" + buoiHoc.getTietKetThuc());
++    }
++
++    private void setupRecyclerView() {
++        sinhVienList = sinhVienService.filterByLop(buoiHoc.getMaLop());
++        diemDanhMap = new HashMap<>();
++
++        adapter = new DiemDanhAdapter(this, sinhVienList, diemDanhMap, new DiemDanhAdapter.OnDiemDanhChangeListener() {
++            @Override
++            public void onStatusChanged(String maSV, boolean coMat) {
++                updateStats();
++            }
++
++            @Override
++            public void onNoteChanged(String maSV, String ghiChu) {
++                if (diemDanhMap.containsKey(maSV)) {
++                    diemDanhMap.get(maSV).setGhiChu(ghiChu);
++                }
++            }
++        });
++
++        recyclerView.setLayoutManager(new LinearLayoutManager(this));
++        recyclerView.setAdapter(adapter);
++    }
++
++    private void setupButtons() {
++        btnDiemDanhTatCa.setOnClickListener(v -> {
++            adapter.setAllStatus(true);
++            updateStats();
++        });
++
++        btnVangTatCa.setOnClickListener(v -> {
++            adapter.setAllStatus(false);
++            updateStats();
++        });
++
++        btnSave.setOnClickListener(v -> saveDiemDanh());
++    }
++
++    private void loadDiemDanh() {
++        List<DiemDanh> existingList = diemDanhService.getDiemDanhByBuoiHoc(buoiHocId);
++
++        if (existingList != null && !existingList.isEmpty()) {
++            for (DiemDanh dd : existingList) {
++                diemDanhMap.put(dd.getMaSV(), dd);
++            }
++            adapter.notifyDataSetChanged();
++        } else {
++            // Initialize with default values (all present)
++            for (SinhVien sv : sinhVienList) {
++                DiemDanh dd = new DiemDanh();
++                dd.setBuoiHocId(buoiHocId);
++                dd.setMaSV(sv.getMaSV());
++                dd.setHoTenSV(sv.getHoTen());
++                dd.setCoMat(true);
++                dd.setGhiChu("");
++                diemDanhMap.put(sv.getMaSV(), dd);
++            }
++        }
++
++        updateStats();
++    }
++
++    private void updateStats() {
++        int coMat = 0;
++        int vang = 0;
++
++        for (DiemDanh dd : diemDanhMap.values()) {
++            if (dd.isCoMat()) {
++                coMat++;
++            } else {
++                vang++;
++            }
++        }
++
++        tvCoMat.setText("Có mặt: " + coMat);
++        tvVang.setText("Vắng: " + vang);
++    }
++
++    private void saveDiemDanh() {
++        int successCount = 0;
++        int totalCount = diemDanhMap.size();
++
++        for (DiemDanh dd : diemDanhMap.values()) {
++            if (diemDanhService.saveDiemDanh(dd)) {
++                successCount++;
++            }
++        }
++
++        if (successCount == totalCount) {
++            Toast.makeText(this, "Lưu điểm danh thành công!", Toast.LENGTH_SHORT).show();
++            finish();
++        } else {
++            Toast.makeText(this, "Lưu thành công " + successCount + "/" + totalCount + " sinh viên",
++                    Toast.LENGTH_LONG).show();
++        }
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/ui/TaoBuoiHocActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/ui/TaoBuoiHocActivity.java b/app/src/main/java/com/teamforone/quanlysinhvien/ui/TaoBuoiHocActivity.java
+new file mode 100644
+--- /dev/null	(date 1765954717083)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/ui/TaoBuoiHocActivity.java	(date 1765954717083)
+@@ -0,0 +1,198 @@
++package com.teamforone.quanlysinhvien.ui;
++
++import android.app.DatePickerDialog;
++import android.os.Bundle;
++import android.widget.ArrayAdapter;
++import android.widget.Button;
++import android.widget.EditText;
++import android.widget.Spinner;
++import android.widget.Toast;
++
++import androidx.appcompat.app.AppCompatActivity;
++import androidx.appcompat.widget.Toolbar;
++
++import com.teamforone.quanlysinhvien.R;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++import com.teamforone.quanlysinhvien.service.BuoiHocService;
++import com.teamforone.quanlysinhvien.service.SinhVienService;
++
++import java.text.SimpleDateFormat;
++import java.util.ArrayList;
++import java.util.Calendar;
++import java.util.List;
++import java.util.Locale;
++
++public class TaoBuoiHocActivity extends AppCompatActivity {
++
++    private Spinner spinnerMonHoc, spinnerGiangVien, spinnerLop;
++    private Spinner spinnerTietBatDau, spinnerTietKetThuc;
++    private EditText etNgayHoc, etGhiChu;
++    private Button btnSave, btnCancel;
++
++    private BuoiHocService buoiHocService;
++    private SinhVienService sinhVienService;
++    private Calendar calendar;
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_tao_buoi_hoc);
++
++        initViews();
++        initServices();
++        setupToolbar();
++        setupSpinners();
++        setupDatePicker();
++        setupButtons();
++    }
++
++    private void initViews() {
++        spinnerMonHoc = findViewById(R.id.spinnerMonHoc);
++        spinnerGiangVien = findViewById(R.id.spinnerGiangVien);
++        spinnerLop = findViewById(R.id.spinnerLop);
++        spinnerTietBatDau = findViewById(R.id.spinnerTietBatDau);
++        spinnerTietKetThuc = findViewById(R.id.spinnerTietKetThuc);
++        etNgayHoc = findViewById(R.id.etNgayHoc);
++        etGhiChu = findViewById(R.id.etGhiChu);
++        btnSave = findViewById(R.id.btnSave);
++        btnCancel = findViewById(R.id.btnCancel);
++        calendar = Calendar.getInstance();
++    }
++
++    private void initServices() {
++        buoiHocService = BuoiHocService.getInstance(this);
++        sinhVienService = SinhVienService.getInstance(this);
++    }
++
++    private void setupToolbar() {
++        Toolbar toolbar = findViewById(R.id.toolbar);
++        setSupportActionBar(toolbar);
++        if (getSupportActionBar() != null) {
++            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
++        }
++        toolbar.setNavigationOnClickListener(v -> onBackPressed());
++    }
++
++    private void setupSpinners() {
++        // Spinner Môn học (demo data)
++        List<String> monHocList = new ArrayList<>();
++        monHocList.add("Chọn môn học");
++        monHocList.add("MH001 - Lập trình Java");
++        monHocList.add("MH002 - Cơ sở dữ liệu");
++        monHocList.add("MH003 - Mạng máy tính");
++        ArrayAdapter<String> monHocAdapter = new ArrayAdapter<>(this,
++                android.R.layout.simple_spinner_item, monHocList);
++        monHocAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
++        spinnerMonHoc.setAdapter(monHocAdapter);
++
++        // Spinner Giảng viên (demo data)
++        List<String> giangVienList = new ArrayList<>();
++        giangVienList.add("Chọn giảng viên");
++        giangVienList.add("GV001 - Nguyễn Văn A");
++        giangVienList.add("GV002 - Trần Thị B");
++        ArrayAdapter<String> giangVienAdapter = new ArrayAdapter<>(this,
++                android.R.layout.simple_spinner_item, giangVienList);
++        giangVienAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
++        spinnerGiangVien.setAdapter(giangVienAdapter);
++
++        // Spinner Lớp
++        List<String> lopList = sinhVienService.getAllLopNames();
++        lopList.remove(0); // Remove "Tất cả"
++        lopList.add(0, "Chọn lớp");
++        ArrayAdapter<String> lopAdapter = new ArrayAdapter<>(this,
++                android.R.layout.simple_spinner_item, lopList);
++        lopAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
++        spinnerLop.setAdapter(lopAdapter);
++
++        // Spinner Tiết học
++        List<String> tietList = new ArrayList<>();
++        for (int i = 1; i <= 12; i++) {
++            tietList.add("Tiết " + i);
++        }
++        ArrayAdapter<String> tietAdapter = new ArrayAdapter<>(this,
++                android.R.layout.simple_spinner_item, tietList);
++        tietAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
++        spinnerTietBatDau.setAdapter(tietAdapter);
++        spinnerTietKetThuc.setAdapter(tietAdapter);
++    }
++
++    private void setupDatePicker() {
++        etNgayHoc.setOnClickListener(v -> {
++            DatePickerDialog dialog = new DatePickerDialog(
++                    this,
++                    (view, year, month, dayOfMonth) -> {
++                        calendar.set(year, month, dayOfMonth);
++                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
++                        etNgayHoc.setText(sdf.format(calendar.getTime()));
++                    },
++                    calendar.get(Calendar.YEAR),
++                    calendar.get(Calendar.MONTH),
++                    calendar.get(Calendar.DAY_OF_MONTH)
++            );
++            dialog.show();
++        });
++    }
++
++    private void setupButtons() {
++        btnSave.setOnClickListener(v -> saveBuoiHoc());
++        btnCancel.setOnClickListener(v -> finish());
++    }
++
++    private void saveBuoiHoc() {
++        // Validate
++        if (spinnerMonHoc.getSelectedItemPosition() == 0) {
++            Toast.makeText(this, "Vui lòng chọn môn học", Toast.LENGTH_SHORT).show();
++            return;
++        }
++
++        if (spinnerLop.getSelectedItemPosition() == 0) {
++            Toast.makeText(this, "Vui lòng chọn lớp", Toast.LENGTH_SHORT).show();
++            return;
++        }
++
++        if (etNgayHoc.getText().toString().trim().isEmpty()) {
++            Toast.makeText(this, "Vui lòng chọn ngày học", Toast.LENGTH_SHORT).show();
++            return;
++        }
++
++        int tietBatDau = spinnerTietBatDau.getSelectedItemPosition() + 1;
++        int tietKetThuc = spinnerTietKetThuc.getSelectedItemPosition() + 1;
++
++        if (tietBatDau > tietKetThuc) {
++            Toast.makeText(this, "Tiết bắt đầu phải nhỏ hơn tiết kết thúc", Toast.LENGTH_SHORT).show();
++            return;
++        }
++
++        // Get data
++        String monHocStr = spinnerMonHoc.getSelectedItem().toString();
++        String maMonHoc = monHocStr.split(" - ")[0];
++
++        String giangVienStr = spinnerGiangVien.getSelectedItemPosition() > 0 ?
++                spinnerGiangVien.getSelectedItem().toString() : "";
++        String maGV = !giangVienStr.isEmpty() ? giangVienStr.split(" - ")[0] : null;
++
++        String lopStr = spinnerLop.getSelectedItem().toString();
++        String maLop = lopStr.split(" - ")[0];
++
++        String ngayHoc = etNgayHoc.getText().toString();
++        String ghiChu = etGhiChu.getText().toString().trim();
++
++        // Create BuoiHoc
++        BuoiHoc buoiHoc = new BuoiHoc();
++        buoiHoc.setMaMonHoc(maMonHoc);
++        buoiHoc.setMaGV(maGV);
++        buoiHoc.setMaLop(maLop);
++        buoiHoc.setNgayHoc(ngayHoc);
++        buoiHoc.setTietBatDau(tietBatDau);
++        buoiHoc.setTietKetThuc(tietKetThuc);
++        buoiHoc.setGhiChu(ghiChu);
++
++        // Save
++        if (buoiHocService.createBuoiHoc(buoiHoc)) {
++            Toast.makeText(this, "Tạo buổi học thành công", Toast.LENGTH_SHORT).show();
++            finish();
++        } else {
++            Toast.makeText(this, "Tạo buổi học thất bại", Toast.LENGTH_SHORT).show();
++        }
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/ui/DanhSachBuoiHocActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/ui/DanhSachBuoiHocActivity.java b/app/src/main/java/com/teamforone/quanlysinhvien/ui/DanhSachBuoiHocActivity.java
+new file mode 100644
+--- /dev/null	(date 1765955585274)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/ui/DanhSachBuoiHocActivity.java	(date 1765955585274)
+@@ -0,0 +1,157 @@
++package com.teamforone.quanlysinhvien.ui;
++
++import android.content.Intent;
++import android.os.Bundle;
++import android.view.View;
++import android.widget.AdapterView;
++import android.widget.ArrayAdapter;
++import android.widget.Spinner;
++import android.widget.TextView;
++
++import androidx.appcompat.app.AppCompatActivity;
++import androidx.appcompat.widget.Toolbar;
++import androidx.recyclerview.widget.LinearLayoutManager;
++import androidx.recyclerview.widget.RecyclerView;
++
++import com.google.android.material.floatingactionbutton.FloatingActionButton;
++import com.teamforone.quanlysinhvien.R;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++import com.teamforone.quanlysinhvien.domain.uiadapters.BuoiHocAdapter;
++import com.teamforone.quanlysinhvien.service.BuoiHocService;
++import com.teamforone.quanlysinhvien.service.SinhVienService;
++
++import java.util.ArrayList;
++import java.util.List;
++
++public class DanhSachBuoiHocActivity extends AppCompatActivity {
++
++    private RecyclerView recyclerView;
++    private TextView tvEmpty;
++    private Spinner spinnerLop;
++    private FloatingActionButton fabAdd, fabHome;
++
++    private BuoiHocService buoiHocService;
++    private SinhVienService sinhVienService;
++    private BuoiHocAdapter adapter;
++    private List<BuoiHoc> buoiHocList;
++    private List<String> lopList;
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_danh_sach_buoi_hoc);
++
++        initViews();
++        initServices();
++        setupToolbar();
++        setupRecyclerView();
++        setupSpinner();
++        setupButtons();
++        loadData();
++    }
++
++    private void initViews() {
++        recyclerView = findViewById(R.id.recyclerView);
++        tvEmpty = findViewById(R.id.tvEmpty);
++        spinnerLop = findViewById(R.id.spinnerLop);
++        fabAdd = findViewById(R.id.fabAdd);
++        fabHome = findViewById(R.id.fabHome);
++    }
++
++    private void initServices() {
++        buoiHocService = BuoiHocService.getInstance(this);
++        sinhVienService = SinhVienService.getInstance(this);
++    }
++
++
++
++    private void setupToolbar() {
++        Toolbar toolbar = findViewById(R.id.toolbar);
++        setSupportActionBar(toolbar);
++        if (getSupportActionBar() != null) {
++            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
++        }
++        toolbar.setNavigationOnClickListener(v -> onBackPressed());
++    }
++
++    private void setupRecyclerView() {
++        buoiHocList = new ArrayList<>();
++        adapter = new BuoiHocAdapter(this, buoiHocList, buoiHoc -> {
++            Intent intent = new Intent(DanhSachBuoiHocActivity.this, DiemDanhActivity.class);
++            intent.putExtra("BUOI_HOC_ID", buoiHoc.getId());
++            startActivity(intent);
++        });
++
++        recyclerView.setLayoutManager(new LinearLayoutManager(this));
++        recyclerView.setAdapter(adapter);
++    }
++
++    private void setupSpinner() {
++        lopList = sinhVienService.getAllLopNames();
++        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(
++                this, android.R.layout.simple_spinner_item, lopList);
++        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
++        spinnerLop.setAdapter(spinnerAdapter);
++
++        spinnerLop.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
++            @Override
++            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
++                filterByLop(position);
++            }
++
++            @Override
++            public void onNothingSelected(AdapterView<?> parent) {}
++        });
++    }
++
++
++    private void setupButtons() {
++        fabAdd.setOnClickListener(v -> {
++            Intent intent = new Intent(this, TaoBuoiHocActivity.class);
++            startActivity(intent);
++        });
++
++        fabHome.setOnClickListener(v -> finish());
++
++        findViewById(R.id.btnResetFilter).setOnClickListener(v -> {
++            spinnerLop.setSelection(0);
++        });
++    }
++
++    private void loadData() {
++        buoiHocList.clear();
++        buoiHocList.addAll(buoiHocService.getAllBuoiHoc());
++        updateUI();
++    }
++
++    private void filterByLop(int position) {
++        buoiHocList.clear();
++
++        if (position == 0) {
++            buoiHocList.addAll(buoiHocService.getAllBuoiHoc());
++        } else {
++            String selected = lopList.get(position);
++            String maLop = selected.split(" - ")[0];
++            buoiHocList.addAll(buoiHocService.getBuoiHocByLop(maLop));
++        }
++
++        updateUI();
++    }
++
++    private void updateUI() {
++        if (buoiHocList.isEmpty()) {
++            recyclerView.setVisibility(View.GONE);
++            tvEmpty.setVisibility(View.VISIBLE);
++        } else {
++            recyclerView.setVisibility(View.VISIBLE);
++            tvEmpty.setVisibility(View.GONE);
++        }
++        adapter.notifyDataSetChanged();
++    }
++
++    @Override
++    protected void onResume() {
++        super.onResume();
++        loadData();
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/service/DiemDanhService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/service/DiemDanhService.java b/app/src/main/java/com/teamforone/quanlysinhvien/service/DiemDanhService.java
+new file mode 100644
+--- /dev/null	(date 1765954516457)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/service/DiemDanhService.java	(date 1765954516457)
+@@ -0,0 +1,53 @@
++package com.teamforone.quanlysinhvien.service;
++
++import android.content.Context;
++
++import com.teamforone.quanlysinhvien.data.dao.DiemDanhDAO;
++import com.teamforone.quanlysinhvien.domain.model.DiemDanh;
++import com.teamforone.quanlysinhvien.domain.usecase.DiemDanhSinhVienUseCase;
++import com.teamforone.quanlysinhvien.domain.usecase.GetDiemDanhByBuoiHocUseCase;
++import com.teamforone.quanlysinhvien.util.AppLogger;
++
++import java.util.List;
++
++public class DiemDanhService {
++    private static DiemDanhService instance;
++
++    private DiemDanhSinhVienUseCase diemDanhSinhVienUseCase;
++    private GetDiemDanhByBuoiHocUseCase getDiemDanhByBuoiHocUseCase;
++    private DiemDanhDAO diemDanhDAO;
++
++    private DiemDanhService(Context context) {
++        diemDanhDAO = new DiemDanhDAO(context);
++        this.diemDanhSinhVienUseCase = new DiemDanhSinhVienUseCase(diemDanhDAO);
++        this.getDiemDanhByBuoiHocUseCase = new GetDiemDanhByBuoiHocUseCase(diemDanhDAO);
++        AppLogger.d("DiemDanhService", "DiemDanhService initialized");
++    }
++
++    public static synchronized DiemDanhService getInstance(Context context) {
++        if (instance == null) {
++            instance = new DiemDanhService(context.getApplicationContext());
++        }
++        return instance;
++    }
++
++    public List<DiemDanh> getDiemDanhByBuoiHoc(int buoiHocId) {
++        AppLogger.d("DiemDanhService", "Getting diem danh for buoi hoc: " + buoiHocId);
++        return getDiemDanhByBuoiHocUseCase.execute(buoiHocId);
++    }
++
++    public boolean saveDiemDanh(DiemDanh diemDanh) {
++        AppLogger.d("DiemDanhService", "Saving diem danh: " + diemDanh);
++        return diemDanhSinhVienUseCase.execute(diemDanh);
++    }
++
++    public boolean deleteDiemDanh(int id) {
++        AppLogger.d("DiemDanhService", "Deleting diem danh: " + id);
++        return diemDanhDAO.delete(id);
++    }
++
++    public boolean deleteByBuoiHoc(int buoiHocId) {
++        AppLogger.d("DiemDanhService", "Deleting all diem danh for buoi hoc: " + buoiHocId);
++        return diemDanhDAO.deleteByBuoiHoc(buoiHocId);
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/service/BuoiHocService.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/service/BuoiHocService.java b/app/src/main/java/com/teamforone/quanlysinhvien/service/BuoiHocService.java
+new file mode 100644
+--- /dev/null	(date 1765954497055)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/service/BuoiHocService.java	(date 1765954497055)
+@@ -0,0 +1,63 @@
++package com.teamforone.quanlysinhvien.service;
++
++import android.content.Context;
++
++import com.teamforone.quanlysinhvien.data.dao.BuoiHocDAO;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++import com.teamforone.quanlysinhvien.domain.usecase.CreateBuoiHocUseCase;
++import com.teamforone.quanlysinhvien.domain.usecase.GetAllBuoiHocUseCase;
++import com.teamforone.quanlysinhvien.util.AppLogger;
++
++import java.util.List;
++
++public class BuoiHocService {
++    private static BuoiHocService instance;
++
++    private GetAllBuoiHocUseCase getAllBuoiHocUseCase;
++    private CreateBuoiHocUseCase createBuoiHocUseCase;
++    private BuoiHocDAO buoiHocDAO;
++
++    private BuoiHocService(Context context) {
++        buoiHocDAO = new BuoiHocDAO(context);
++        this.getAllBuoiHocUseCase = new GetAllBuoiHocUseCase(buoiHocDAO);
++        this.createBuoiHocUseCase = new CreateBuoiHocUseCase(buoiHocDAO);
++        AppLogger.d("BuoiHocService", "BuoiHocService initialized");
++    }
++
++    public static synchronized BuoiHocService getInstance(Context context) {
++        if (instance == null) {
++            instance = new BuoiHocService(context.getApplicationContext());
++        }
++        return instance;
++    }
++
++    public List<BuoiHoc> getAllBuoiHoc() {
++        AppLogger.d("BuoiHocService", "Getting all buoi hoc");
++        return getAllBuoiHocUseCase.execute();
++    }
++
++    public List<BuoiHoc> getBuoiHocByLop(String maLop) {
++        AppLogger.d("BuoiHocService", "Getting buoi hoc by lop: " + maLop);
++        return getAllBuoiHocUseCase.getByLop(maLop);
++    }
++
++    public BuoiHoc getBuoiHocById(int id) {
++        AppLogger.d("BuoiHocService", "Getting buoi hoc by id: " + id);
++        return getAllBuoiHocUseCase.getById(id);
++    }
++
++    public boolean createBuoiHoc(BuoiHoc buoiHoc) {
++        AppLogger.d("BuoiHocService", "Creating buoi hoc: " + buoiHoc);
++        return createBuoiHocUseCase.execute(buoiHoc);
++    }
++
++    public boolean updateBuoiHoc(BuoiHoc buoiHoc) {
++        AppLogger.d("BuoiHocService", "Updating buoi hoc: " + buoiHoc);
++        return buoiHocDAO.update(buoiHoc);
++    }
++
++    public boolean deleteBuoiHoc(int id) {
++        AppLogger.d("BuoiHocService", "Deleting buoi hoc: " + id);
++        return buoiHocDAO.delete(id);
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetDiemDanhByBuoiHocUseCase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetDiemDanhByBuoiHocUseCase.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetDiemDanhByBuoiHocUseCase.java
+new file mode 100644
+--- /dev/null	(date 1765954468473)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetDiemDanhByBuoiHocUseCase.java	(date 1765954468473)
+@@ -0,0 +1,21 @@
++package com.teamforone.quanlysinhvien.domain.usecase;
++
++import com.teamforone.quanlysinhvien.data.dao.DiemDanhDAO;
++import com.teamforone.quanlysinhvien.domain.model.DiemDanh;
++
++import java.util.List;
++
++public class GetDiemDanhByBuoiHocUseCase {
++    private DiemDanhDAO diemDanhDAO;
++
++    public GetDiemDanhByBuoiHocUseCase(DiemDanhDAO diemDanhDAO) {
++        this.diemDanhDAO = diemDanhDAO;
++    }
++
++    public List<DiemDanh> execute(int buoiHocId) {
++        if (buoiHocId <= 0) {
++            return null;
++        }
++        return diemDanhDAO.getByBuoiHoc(buoiHocId);
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/DiemDanhSinhVienUseCase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/DiemDanhSinhVienUseCase.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/DiemDanhSinhVienUseCase.java
+new file mode 100644
+--- /dev/null	(date 1765954391046)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/DiemDanhSinhVienUseCase.java	(date 1765954391046)
+@@ -0,0 +1,33 @@
++package com.teamforone.quanlysinhvien.domain.usecase;
++
++import com.teamforone.quanlysinhvien.data.dao.DiemDanhDAO;
++import com.teamforone.quanlysinhvien.domain.model.DiemDanh;
++
++public class DiemDanhSinhVienUseCase {
++    private DiemDanhDAO diemDanhDAO;
++
++    public DiemDanhSinhVienUseCase(DiemDanhDAO diemDanhDAO) {
++        this.diemDanhDAO = diemDanhDAO;
++    }
++
++    public boolean execute(DiemDanh diemDanh) {
++        if (diemDanh == null) {
++            return false;
++        }
++
++        if (diemDanh.getBuoiHocId() <= 0) {
++            return false;
++        }
++
++        if (diemDanh.getMaSV() == null || diemDanh.getMaSV().trim().isEmpty()) {
++            return false;
++        }
++
++        // Check if already exists, then update instead
++        if (diemDanhDAO.exists(diemDanh.getBuoiHocId(), diemDanh.getMaSV())) {
++            return diemDanhDAO.update(diemDanh);
++        }
++
++        return diemDanhDAO.insert(diemDanh);
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetAllBuoiHocUseCase.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetAllBuoiHocUseCase.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetAllBuoiHocUseCase.java
+new file mode 100644
+--- /dev/null	(date 1765954438073)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/usecase/GetAllBuoiHocUseCase.java	(date 1765954438073)
+@@ -0,0 +1,26 @@
++package com.teamforone.quanlysinhvien.domain.usecase;
++
++import com.teamforone.quanlysinhvien.data.dao.BuoiHocDAO;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++
++import java.util.List;
++
++public class GetAllBuoiHocUseCase {
++    private BuoiHocDAO buoiHocDAO;
++
++    public GetAllBuoiHocUseCase(BuoiHocDAO buoiHocDAO) {
++        this.buoiHocDAO = buoiHocDAO;
++    }
++
++    public List<BuoiHoc> execute() {
++        return buoiHocDAO.getAll();
++    }
++
++    public List<BuoiHoc> getByLop(String maLop) {
++        return buoiHocDAO.getByLop(maLop);
++    }
++
++    public BuoiHoc getById(int id) {
++        return buoiHocDAO.getById(id);
++    }
++}
+\ No newline at end of file
+Index: app/src/main/res/layout/item_sinh_vien_diem_danh.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_sinh_vien_diem_danh.xml b/app/src/main/res/layout/item_sinh_vien_diem_danh.xml
+new file mode 100644
+--- /dev/null	(date 1765954869465)
++++ b/app/src/main/res/layout/item_sinh_vien_diem_danh.xml	(date 1765954869465)
+@@ -0,0 +1,61 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content"
++    android:layout_margin="8dp"
++    app:cardCornerRadius="8dp"
++    app:cardElevation="2dp">
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="horizontal"
++        android:padding="16dp"
++        android:gravity="center_vertical">
++
++        <LinearLayout
++            android:layout_width="0dp"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"
++            android:orientation="vertical">
++
++            <TextView
++                android:id="@+id/tvMaSV"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="SV001"
++                android:textSize="14sp"
++                android:textStyle="bold"
++                android:textColor="@color/colorPrimary" />
++
++            <TextView
++                android:id="@+id/tvHoTen"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Nguyễn Văn A"
++                android:textSize="16sp"
++                android:textColor="#333"
++                android:layout_marginTop="4dp" />
++
++            <EditText
++                android:id="@+id/etGhiChu"
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:hint="Ghi chú..."
++                android:textSize="12sp"
++                android:layout_marginTop="8dp"
++                android:background="@android:color/transparent"
++                android:inputType="text" />
++        </LinearLayout>
++
++        <CheckBox
++            android:id="@+id/cbCoMat"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="Có mặt"
++            android:textSize="14sp"
++            android:buttonTint="@color/colorPrimary"
++            android:layout_marginStart="16dp" />
++    </LinearLayout>
++</androidx.cardview.widget.CardView>
+\ No newline at end of file
+Index: app/src/main/res/layout/item_buoi_hoc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_buoi_hoc.xml b/app/src/main/res/layout/item_buoi_hoc.xml
+new file mode 100644
+--- /dev/null	(date 1765954869472)
++++ b/app/src/main/res/layout/item_buoi_hoc.xml	(date 1765954869472)
+@@ -0,0 +1,92 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content"
++    android:layout_margin="8dp"
++    app:cardCornerRadius="8dp"
++    app:cardElevation="4dp">
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="horizontal"
++        android:padding="16dp">
++
++        <LinearLayout
++            android:layout_width="0dp"
++            android:layout_height="wrap_content"
++            android:layout_weight="1"
++            android:orientation="vertical">
++
++            <TextView
++                android:id="@+id/tvMonHoc"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Lập trình Java"
++                android:textSize="18sp"
++                android:textStyle="bold"
++                android:textColor="@color/colorPrimary" />
++
++            <TextView
++                android:id="@+id/tvLop"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Lớp: CNTT01"
++                android:textSize="14sp"
++                android:textColor="#666"
++                android:layout_marginTop="4dp" />
++
++            <TextView
++                android:id="@+id/tvGiangVien"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="GV: Nguyễn Văn A"
++                android:textSize="14sp"
++                android:textColor="#666"
++                android:layout_marginTop="2dp" />
++
++            <TextView
++                android:id="@+id/tvNgayHoc"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Ngày: 15/12/2024"
++                android:textSize="14sp"
++                android:textColor="#333"
++                android:textStyle="bold"
++                android:layout_marginTop="4dp" />
++
++            <TextView
++                android:id="@+id/tvTiet"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Tiết: 1-3"
++                android:textSize="14sp"
++                android:textColor="#666"
++                android:layout_marginTop="2dp" />
++        </LinearLayout>
++
++        <LinearLayout
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:orientation="vertical"
++            android:gravity="center">
++
++            <ImageButton
++                android:id="@+id/btnDiemDanh"
++                android:layout_width="56dp"
++                android:layout_height="56dp"
++                android:src="@drawable/ic_attendance"
++                android:background="?attr/selectableItemBackgroundBorderless"
++                android:contentDescription="Điểm danh"
++                app:tint="#4CAF50" />
++
++            <TextView
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Điểm danh"
++                android:textSize="12sp"
++                android:textColor="#4CAF50" />
++        </LinearLayout>
++    </LinearLayout>
++</androidx.cardview.widget.CardView>
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_diem_danh.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_diem_danh.xml b/app/src/main/res/layout/activity_diem_danh.xml
+new file mode 100644
+--- /dev/null	(date 1765954788461)
++++ b/app/src/main/res/layout/activity_diem_danh.xml	(date 1765954788461)
+@@ -0,0 +1,144 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:orientation="vertical"
++    android:background="#F5F5F5">
++
++    <androidx.appcompat.widget.Toolbar
++        android:id="@+id/toolbar"
++        android:layout_width="match_parent"
++        android:layout_height="?attr/actionBarSize"
++        android:background="@color/colorPrimary"
++        android:elevation="4dp"
++        app:title="Điểm Danh"
++        app:titleTextColor="@android:color/white"
++        app:navigationIcon="?attr/homeAsUpIndicator" />
++
++    <androidx.cardview.widget.CardView
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:layout_margin="16dp"
++        app:cardCornerRadius="8dp"
++        app:cardElevation="4dp">
++
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:orientation="vertical"
++            android:padding="16dp">
++
++            <TextView
++                android:id="@+id/tvMonHoc"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Môn học: Lập trình Java"
++                android:textSize="16sp"
++                android:textStyle="bold"
++                android:textColor="@color/colorPrimary" />
++
++            <TextView
++                android:id="@+id/tvLop"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Lớp: CNTT01"
++                android:textSize="14sp"
++                android:textColor="#666"
++                android:layout_marginTop="4dp" />
++
++            <TextView
++                android:id="@+id/tvNgayHoc"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Ngày: 15/12/2024"
++                android:textSize="14sp"
++                android:textColor="#666"
++                android:layout_marginTop="4dp" />
++
++            <TextView
++                android:id="@+id/tvTiet"
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Tiết: 1-3"
++                android:textSize="14sp"
++                android:textColor="#666"
++                android:layout_marginTop="4dp" />
++
++            <LinearLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:orientation="horizontal"
++                android:layout_marginTop="12dp">
++
++                <TextView
++                    android:id="@+id/tvCoMat"
++                    android:layout_width="0dp"
++                    android:layout_height="wrap_content"
++                    android:layout_weight="1"
++                    android:text="Có mặt: 0"
++                    android:textSize="14sp"
++                    android:textColor="#4CAF50"
++                    android:textStyle="bold" />
++
++                <TextView
++                    android:id="@+id/tvVang"
++                    android:layout_width="0dp"
++                    android:layout_height="wrap_content"
++                    android:layout_weight="1"
++                    android:text="Vắng: 0"
++                    android:textSize="14sp"
++                    android:textColor="#F44336"
++                    android:textStyle="bold"
++                    android:gravity="end" />
++            </LinearLayout>
++        </LinearLayout>
++    </androidx.cardview.widget.CardView>
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="horizontal"
++        android:padding="16dp"
++        android:paddingTop="0dp">
++
++        <Button
++            android:id="@+id/btnDiemDanhTatCa"
++            android:layout_width="0dp"
++            android:layout_height="48dp"
++            android:layout_weight="1"
++            android:text="Có mặt tất cả"
++            android:textColor="@android:color/white"
++            android:background="@color/colorPrimary"
++            android:layout_marginEnd="8dp" />
++
++        <Button
++            android:id="@+id/btnVangTatCa"
++            android:layout_width="0dp"
++            android:layout_height="48dp"
++            android:layout_weight="1"
++            android:text="Vắng tất cả"
++            android:textColor="@android:color/white"
++            android:background="#F44336"
++            android:layout_marginStart="8dp" />
++    </LinearLayout>
++
++    <androidx.recyclerview.widget.RecyclerView
++        android:id="@+id/recyclerView"
++        android:layout_width="match_parent"
++        android:layout_height="0dp"
++        android:layout_weight="1"
++        android:padding="8dp"
++        android:clipToPadding="false" />
++
++    <Button
++        android:id="@+id/btnSave"
++        android:layout_width="match_parent"
++        android:layout_height="56dp"
++        android:layout_margin="16dp"
++        android:text="Lưu Điểm Danh"
++        android:textColor="@android:color/white"
++        android:textStyle="bold"
++        android:background="@color/colorPrimary" />
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_tao_buoi_hoc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_tao_buoi_hoc.xml b/app/src/main/res/layout/activity_tao_buoi_hoc.xml
+new file mode 100644
+--- /dev/null	(date 1765954815988)
++++ b/app/src/main/res/layout/activity_tao_buoi_hoc.xml	(date 1765954815988)
+@@ -0,0 +1,186 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:orientation="vertical"
++    android:background="#F5F5F5">
++
++    <androidx.appcompat.widget.Toolbar
++        android:id="@+id/toolbar"
++        android:layout_width="match_parent"
++        android:layout_height="?attr/actionBarSize"
++        android:background="@color/colorPrimary"
++        android:elevation="4dp"
++        app:title="Tạo Buổi Học"
++        app:titleTextColor="@android:color/white"
++        app:navigationIcon="?attr/homeAsUpIndicator" />
++
++    <ScrollView
++        android:layout_width="match_parent"
++        android:layout_height="0dp"
++        android:layout_weight="1">
++
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:orientation="vertical"
++            android:padding="24dp">
++
++            <androidx.cardview.widget.CardView
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                app:cardCornerRadius="12dp"
++                app:cardElevation="4dp">
++
++                <LinearLayout
++                    android:layout_width="match_parent"
++                    android:layout_height="wrap_content"
++                    android:orientation="vertical"
++                    android:padding="20dp">
++
++                    <TextView
++                        android:layout_width="wrap_content"
++                        android:layout_height="wrap_content"
++                        android:text="Môn học *"
++                        android:textSize="14sp"
++                        android:textColor="#666" />
++
++                    <Spinner
++                        android:id="@+id/spinnerMonHoc"
++                        android:layout_width="match_parent"
++                        android:layout_height="48dp"
++                        android:layout_marginTop="8dp"
++                        android:background="@drawable/spinner_background" />
++
++                    <TextView
++                        android:layout_width="wrap_content"
++                        android:layout_height="wrap_content"
++                        android:layout_marginTop="16dp"
++                        android:text="Giảng viên"
++                        android:textSize="14sp"
++                        android:textColor="#666" />
++
++                    <Spinner
++                        android:id="@+id/spinnerGiangVien"
++                        android:layout_width="match_parent"
++                        android:layout_height="48dp"
++                        android:layout_marginTop="8dp"
++                        android:background="@drawable/spinner_background" />
++
++                    <TextView
++                        android:layout_width="wrap_content"
++                        android:layout_height="wrap_content"
++                        android:layout_marginTop="16dp"
++                        android:text="Lớp *"
++                        android:textSize="14sp"
++                        android:textColor="#666" />
++
++                    <Spinner
++                        android:id="@+id/spinnerLop"
++                        android:layout_width="match_parent"
++                        android:layout_height="48dp"
++                        android:layout_marginTop="8dp"
++                        android:background="@drawable/spinner_background" />
++
++                    <com.google.android.material.textfield.TextInputLayout
++                        android:layout_width="match_parent"
++                        android:layout_height="wrap_content"
++                        android:layout_marginTop="16dp"
++                        android:hint="Ngày học (dd/MM/yyyy) *"
++                        app:startIconDrawable="@android:drawable/ic_menu_my_calendar">
++
++                        <com.google.android.material.textfield.TextInputEditText
++                            android:id="@+id/etNgayHoc"
++                            android:layout_width="match_parent"
++                            android:layout_height="wrap_content"
++                            android:focusable="false"
++                            android:clickable="true"
++                            android:cursorVisible="false"
++                            android:inputType="none" />
++                    </com.google.android.material.textfield.TextInputLayout>
++
++                    <TextView
++                        android:layout_width="wrap_content"
++                        android:layout_height="wrap_content"
++                        android:layout_marginTop="16dp"
++                        android:text="Tiết học *"
++                        android:textSize="14sp"
++                        android:textColor="#666" />
++
++                    <LinearLayout
++                        android:layout_width="match_parent"
++                        android:layout_height="wrap_content"
++                        android:orientation="horizontal"
++                        android:layout_marginTop="8dp">
++
++                        <Spinner
++                            android:id="@+id/spinnerTietBatDau"
++                            android:layout_width="0dp"
++                            android:layout_height="48dp"
++                            android:layout_weight="1"
++                            android:background="@drawable/spinner_background" />
++
++                        <TextView
++                            android:layout_width="wrap_content"
++                            android:layout_height="wrap_content"
++                            android:text=" - "
++                            android:textSize="16sp"
++                            android:layout_gravity="center_vertical"
++                            android:paddingStart="8dp"
++                            android:paddingEnd="8dp" />
++
++                        <Spinner
++                            android:id="@+id/spinnerTietKetThuc"
++                            android:layout_width="0dp"
++                            android:layout_height="48dp"
++                            android:layout_weight="1"
++                            android:background="@drawable/spinner_background" />
++                    </LinearLayout>
++
++                    <com.google.android.material.textfield.TextInputLayout
++                        android:layout_width="match_parent"
++                        android:layout_height="wrap_content"
++                        android:layout_marginTop="16dp"
++                        android:hint="Ghi chú">
++
++                        <com.google.android.material.textfield.TextInputEditText
++                            android:id="@+id/etGhiChu"
++                            android:layout_width="match_parent"
++                            android:layout_height="wrap_content"
++                            android:inputType="textMultiLine"
++                            android:minLines="2" />
++                    </com.google.android.material.textfield.TextInputLayout>
++
++                </LinearLayout>
++            </androidx.cardview.widget.CardView>
++
++            <LinearLayout
++                android:layout_width="match_parent"
++                android:layout_height="wrap_content"
++                android:orientation="horizontal"
++                android:layout_marginTop="24dp">
++
++                <Button
++                    android:id="@+id/btnCancel"
++                    android:layout_width="0dp"
++                    android:layout_height="56dp"
++                    android:layout_weight="1"
++                    android:text="Hủy"
++                    android:textColor="@color/colorPrimary"
++                    android:background="@drawable/button_outline"
++                    android:layout_marginEnd="8dp" />
++
++                <Button
++                    android:id="@+id/btnSave"
++                    android:layout_width="0dp"
++                    android:layout_height="56dp"
++                    android:layout_weight="1"
++                    android:text="Lưu"
++                    android:textColor="@android:color/white"
++                    android:background="@color/colorPrimary"
++                    android:layout_marginStart="8dp" />
++            </LinearLayout>
++        </LinearLayout>
++    </ScrollView>
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_danh_sach_buoi_hoc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_danh_sach_buoi_hoc.xml b/app/src/main/res/layout/activity_danh_sach_buoi_hoc.xml
+new file mode 100644
+--- /dev/null	(date 1765954756668)
++++ b/app/src/main/res/layout/activity_danh_sach_buoi_hoc.xml	(date 1765954756668)
+@@ -0,0 +1,100 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    android:orientation="vertical"
++    android:background="#F5F5F5">
++
++    <androidx.appcompat.widget.Toolbar
++        android:id="@+id/toolbar"
++        android:layout_width="match_parent"
++        android:layout_height="?attr/actionBarSize"
++        android:background="@color/colorPrimary"
++        android:elevation="4dp"
++        app:title="Danh Sách Buổi Học"
++        app:titleTextColor="@android:color/white"
++        app:navigationIcon="?attr/homeAsUpIndicator" />
++
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="vertical"
++        android:padding="16dp"
++        android:background="@android:color/white"
++        android:elevation="2dp">
++
++        <TextView
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:text="Lọc theo lớp:"
++            android:textSize="14sp"
++            android:textColor="#666" />
++
++        <LinearLayout
++            android:layout_width="match_parent"
++            android:layout_height="wrap_content"
++            android:orientation="horizontal"
++            android:layout_marginTop="8dp">
++
++            <Spinner
++                android:id="@+id/spinnerLop"
++                android:layout_width="0dp"
++                android:layout_height="48dp"
++                android:layout_weight="1"
++                android:background="@drawable/spinner_background" />
++
++            <Button
++                android:id="@+id/btnResetFilter"
++                android:layout_width="wrap_content"
++                android:layout_height="48dp"
++                android:layout_marginStart="8dp"
++                android:text="Reset"
++                android:textColor="@android:color/white"
++                android:background="@color/colorAccent" />
++        </LinearLayout>
++    </LinearLayout>
++
++    <androidx.recyclerview.widget.RecyclerView
++        android:id="@+id/recyclerView"
++        android:layout_width="match_parent"
++        android:layout_height="0dp"
++        android:layout_weight="1"
++        android:padding="8dp"
++        android:clipToPadding="false" />
++
++    <TextView
++        android:id="@+id/tvEmpty"
++        android:layout_width="match_parent"
++        android:layout_height="0dp"
++        android:layout_weight="1"
++        android:text="Chưa có buổi học nào"
++        android:textSize="16sp"
++        android:textColor="#999"
++        android:gravity="center"
++        android:visibility="gone" />
++
++    <FrameLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:padding="16dp">
++
++        <com.google.android.material.floatingactionbutton.FloatingActionButton
++            android:id="@+id/fabHome"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_gravity="start|bottom"
++            android:src="@android:drawable/ic_menu_view"
++            app:tint="@android:color/white"
++            app:backgroundTint="@color/colorAccent" />
++
++        <com.google.android.material.floatingactionbutton.FloatingActionButton
++            android:id="@+id/fabAdd"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content"
++            android:layout_gravity="end|bottom"
++            android:src="@android:drawable/ic_input_add"
++            app:tint="@android:color/white"
++            app:backgroundTint="@color/colorPrimary" />
++    </FrameLayout>
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/DiemDanhAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/DiemDanhAdapter.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/DiemDanhAdapter.java
+new file mode 100644
+--- /dev/null	(date 1765954289788)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/DiemDanhAdapter.java	(date 1765954289788)
+@@ -0,0 +1,127 @@
++package com.teamforone.quanlysinhvien.domain.uiadapters;
++
++import android.content.Context;
++import android.text.Editable;
++import android.text.TextWatcher;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.CheckBox;
++import android.widget.EditText;
++import android.widget.TextView;
++
++import androidx.annotation.NonNull;
++import androidx.recyclerview.widget.RecyclerView;
++
++import com.teamforone.quanlysinhvien.R;
++import com.teamforone.quanlysinhvien.domain.model.DiemDanh;
++import com.teamforone.quanlysinhvien.domain.model.SinhVien;
++
++import java.util.List;
++import java.util.Map;
++
++public class DiemDanhAdapter extends RecyclerView.Adapter<DiemDanhAdapter.ViewHolder> {
++
++    private Context context;
++    private List<SinhVien> sinhVienList;
++    private Map<String, DiemDanh> diemDanhMap;
++    private OnDiemDanhChangeListener listener;
++
++    public interface OnDiemDanhChangeListener {
++        void onStatusChanged(String maSV, boolean coMat);
++        void onNoteChanged(String maSV, String ghiChu);
++    }
++
++    public DiemDanhAdapter(Context context, List<SinhVien> sinhVienList,
++                           Map<String, DiemDanh> diemDanhMap, OnDiemDanhChangeListener listener) {
++        this.context = context;
++        this.sinhVienList = sinhVienList;
++        this.diemDanhMap = diemDanhMap;
++        this.listener = listener;
++    }
++
++    @NonNull
++    @Override
++    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
++        View view = LayoutInflater.from(context).inflate(R.layout.item_sinh_vien_diem_danh, parent, false);
++        return new ViewHolder(view);
++    }
++
++    @Override
++    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
++        SinhVien sv = sinhVienList.get(position);
++        DiemDanh dd = diemDanhMap.get(sv.getMaSV());
++
++        holder.tvMaSV.setText(sv.getMaSV());
++        holder.tvHoTen.setText(sv.getHoTen());
++
++        // Remove listener temporarily
++        holder.cbCoMat.setOnCheckedChangeListener(null);
++        holder.etGhiChu.removeTextChangedListener(holder.textWatcher);
++
++        if (dd != null) {
++            holder.cbCoMat.setChecked(dd.isCoMat());
++            holder.etGhiChu.setText(dd.getGhiChu() != null ? dd.getGhiChu() : "");
++        } else {
++            holder.cbCoMat.setChecked(true);
++            holder.etGhiChu.setText("");
++        }
++
++        // Set listener back
++        holder.cbCoMat.setOnCheckedChangeListener((buttonView, isChecked) -> {
++            if (dd != null) {
++                dd.setCoMat(isChecked);
++                if (listener != null) {
++                    listener.onStatusChanged(sv.getMaSV(), isChecked);
++                }
++            }
++        });
++
++        holder.textWatcher = new TextWatcher() {
++            @Override
++            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
++
++            @Override
++            public void onTextChanged(CharSequence s, int start, int before, int count) {}
++
++            @Override
++            public void afterTextChanged(Editable s) {
++                if (dd != null) {
++                    dd.setGhiChu(s.toString());
++                    if (listener != null) {
++                        listener.onNoteChanged(sv.getMaSV(), s.toString());
++                    }
++                }
++            }
++        };
++
++        holder.etGhiChu.addTextChangedListener(holder.textWatcher);
++    }
++
++    @Override
++    public int getItemCount() {
++        return sinhVienList.size();
++    }
++
++    public void setAllStatus(boolean coMat) {
++        for (DiemDanh dd : diemDanhMap.values()) {
++            dd.setCoMat(coMat);
++        }
++        notifyDataSetChanged();
++    }
++
++    static class ViewHolder extends RecyclerView.ViewHolder {
++        TextView tvMaSV, tvHoTen;
++        EditText etGhiChu;
++        CheckBox cbCoMat;
++        TextWatcher textWatcher;
++
++        ViewHolder(@NonNull View itemView) {
++            super(itemView);
++            tvMaSV = itemView.findViewById(R.id.tvMaSV);
++            tvHoTen = itemView.findViewById(R.id.tvHoTen);
++            etGhiChu = itemView.findViewById(R.id.etGhiChu);
++            cbCoMat = itemView.findViewById(R.id.cbCoMat);
++        }
++    }
++}
+\ No newline at end of file
+Index: app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/BuoiHocAdapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/BuoiHocAdapter.java b/app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/BuoiHocAdapter.java
+new file mode 100644
+--- /dev/null	(date 1765954339353)
++++ b/app/src/main/java/com/teamforone/quanlysinhvien/domain/uiadapters/BuoiHocAdapter.java	(date 1765954339353)
+@@ -0,0 +1,78 @@
++package com.teamforone.quanlysinhvien.domain.uiadapters;
++
++
++import android.content.Context;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ImageButton;
++import android.widget.TextView;
++
++import androidx.annotation.NonNull;
++import androidx.recyclerview.widget.RecyclerView;
++
++import com.teamforone.quanlysinhvien.R;
++import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
++
++import java.util.List;
++
++public class BuoiHocAdapter extends RecyclerView.Adapter<BuoiHocAdapter.ViewHolder> {
++
++    private Context context;
++    private List<BuoiHoc> buoiHocList;
++    private OnItemClickListener listener;
++
++    public interface OnItemClickListener {
++        void onDiemDanhClick(BuoiHoc buoiHoc);
++    }
++
++    public BuoiHocAdapter(Context context, List<BuoiHoc> buoiHocList, OnItemClickListener listener) {
++        this.context = context;
++        this.buoiHocList = buoiHocList;
++        this.listener = listener;
++    }
++
++    @NonNull
++    @Override
++    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
++        View view = LayoutInflater.from(context).inflate(R.layout.item_buoi_hoc, parent, false);
++        return new ViewHolder(view);
++    }
++
++    @Override
++    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
++        BuoiHoc buoiHoc = buoiHocList.get(position);
++
++        holder.tvMonHoc.setText(buoiHoc.getTenMonHoc() != null ? buoiHoc.getTenMonHoc() : buoiHoc.getMaMonHoc());
++        holder.tvLop.setText("Lớp: " + (buoiHoc.getTenLop() != null ? buoiHoc.getTenLop() : buoiHoc.getMaLop()));
++        holder.tvGiangVien.setText("GV: " + (buoiHoc.getHoTenGV() != null ? buoiHoc.getHoTenGV() : "Chưa phân công"));
++        holder.tvNgayHoc.setText("Ngày: " + buoiHoc.getNgayHoc());
++        holder.tvTiet.setText("Tiết: " + buoiHoc.getTietBatDau() + "-" + buoiHoc.getTietKetThuc());
++
++        holder.btnDiemDanh.setOnClickListener(v -> {
++            if (listener != null) {
++                listener.onDiemDanhClick(buoiHoc);
++            }
++        });
++    }
++
++    @Override
++    public int getItemCount() {
++        return buoiHocList.size();
++    }
++
++    static class ViewHolder extends RecyclerView.ViewHolder {
++        TextView tvMonHoc, tvLop, tvGiangVien, tvNgayHoc, tvTiet;
++        ImageButton btnDiemDanh;
++
++        ViewHolder(@NonNull View itemView) {
++            super(itemView);
++            tvMonHoc = itemView.findViewById(R.id.tvMonHoc);
++            tvLop = itemView.findViewById(R.id.tvLop);
++            tvGiangVien = itemView.findViewById(R.id.tvGiangVien);
++            tvNgayHoc = itemView.findViewById(R.id.tvNgayHoc);
++            tvTiet = itemView.findViewById(R.id.tvTiet);
++            btnDiemDanh = itemView.findViewById(R.id.btnDiemDanh);
++        }
++    }
++}
+\ No newline at end of file
