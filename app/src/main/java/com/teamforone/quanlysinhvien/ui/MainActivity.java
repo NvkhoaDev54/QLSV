@@ -108,8 +108,12 @@ public class MainActivity extends AppCompatActivity {
         cardStatistics.setOnClickListener(
                 v -> startActivity(new Intent(this, ReportActivity.class)));
         // TODO: Thêm các activity khác khi sẵn sàng
-        cardAttendance.setOnClickListener(
-                v -> startActivity(new Intent(this, DanhSachBuoiHocActivity.class)));
+        cardAttendance.setOnClickListener(v -> {
+            Intent intent = new Intent(this, DanhSachBuoiHocActivity.class);
+            intent.putExtra("user", currentUser); // TRUYỀN USER
+            startActivity(intent);
+        });
+
         cardLogout.setOnClickListener(v -> showLogoutDialog());
     }
 
