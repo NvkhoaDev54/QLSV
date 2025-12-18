@@ -45,7 +45,7 @@ public class DiemDanhActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_diem_danh);
 
-        buoiHocId = getIntent().getIntExtra("BUOI_HOC_ID", -1);
+        buoiHocId = getIntent().getIntExtra("buoiHocId", -1);
         if (buoiHocId == -1) {
             Toast.makeText(this, "Lỗi: Không tìm thấy buổi học", Toast.LENGTH_SHORT).show();
             finish();

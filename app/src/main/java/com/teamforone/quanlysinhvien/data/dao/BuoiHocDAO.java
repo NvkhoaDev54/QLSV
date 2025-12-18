@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BuoiHocDAO {
+
     private final DatabaseProvider databaseProvider;
 
     public BuoiHocDAO(Context context) {
@@ -20,18 +21,17 @@ public class BuoiHocDAO {
     }
 
     /**
-     * Lấy tất cả buổi học (kèm join bảng để lấy tên môn, tên lớp, tên GV)
+     * Lấy tất cả buổi học kèm tên môn và tên lớp
      */
     public List<BuoiHoc> getAllBuoiHoc() {
         List<BuoiHoc> list = new ArrayList<>();
         SQLiteDatabase db = databaseProvider.getReadableDatabase();
-        // Đã xóa g.hoTen
+
         String query = "SELECT b.*, m.tenMH, l.tenLop " +
                 "FROM BUOI_HOC b " +
                 "LEFT JOIN MONHOC m ON b.maMH = m.maMH " +
                 "LEFT JOIN LOP l ON b.maLop = l.maLop " +
                 "ORDER BY b.ngayHoc DESC";
-
 
         Cursor cursor = null;
         try {
@@ -50,12 +50,13 @@ public class BuoiHocDAO {
     }
 
     /**
-     * Lọc buổi học theo mã lớp
+     * Lọc theo mã lớp
      */
     public List<BuoiHoc> getByLop(String maLop) {
         List<BuoiHoc> list = new ArrayList<>();
         SQLiteDatabase db = databaseProvider.getReadableDatabase();
-        String query = "SELECT b.*, m.tenMH, g.hoTen AS hoTenGV, l.tenLop " +
+
+        String query = "SELECT b.*, m.tenMH, l.tenLop " +
                 "FROM BUOI_HOC b " +
                 "LEFT JOIN MONHOC m ON b.maMH = m.maMH " +
                 "LEFT JOIN LOP l ON b.maLop = l.maLop " +
@@ -79,14 +80,17 @@ public class BuoiHocDAO {
     }
 
     /**
-     * Lấy chi tiết buổi học theo ID
+     * Lấy buổi học theo ID
      */
     public BuoiHoc getById(int id) {
         SQLiteDatabase db = databaseProvider.getReadableDatabase();
-        String query = "SELECT b.*, m.tenMH, g.hoTen AS hoTenGV, l.tenLop FROM BUOI_HOC b " +
+
+        String query = "SELECT b.*, m.tenMH, l.tenLop " +
+                "FROM BUOI_HOC b " +
                 "LEFT JOIN MONHOC m ON b.maMH = m.maMH " +
                 "LEFT JOIN LOP l ON b.maLop = l.maLop " +
                 "WHERE b.id = ?";
+
         Cursor cursor = null;
         try {
             cursor = db.rawQuery(query, new String[]{String.valueOf(id)});
@@ -102,7 +106,7 @@ public class BuoiHocDAO {
     }
 
     /**
-     * Thêm mới buổi học
+     * Thêm mới buổi học (Đã bỏ ghi chú)
      */
     public boolean insert(BuoiHoc buoiHoc) {
         SQLiteDatabase db = databaseProvider.getWritableDatabase();
@@ -113,7 +117,7 @@ public class BuoiHocDAO {
             values.put("ngayHoc", buoiHoc.getNgayHoc());
             values.put("tietBatDau", buoiHoc.getTietBatDau());
             values.put("tietKetThuc", buoiHoc.getTietKetThuc());
-            values.put("ghiChu", buoiHoc.getGhiChu());
+            // Đã xóa: values.put("ghiChu", buoiHoc.getGhiChu());
 
             long result = db.insert("BUOI_HOC", null, values);
             return result != -1;
@@ -124,7 +128,7 @@ public class BuoiHocDAO {
     }
 
     /**
-     * Cập nhật thông tin buổi học (HÀM MỚI THÊM ĐỂ HẾT LỖI)
+     * Cập nhật buổi học (Đã bỏ ghi chú)
      */
     public boolean update(BuoiHoc buoiHoc) {
         SQLiteDatabase db = databaseProvider.getWritableDatabase();
@@ -135,7 +139,6 @@ public class BuoiHocDAO {
             values.put("ngayHoc", buoiHoc.getNgayHoc());
             values.put("tietBatDau", buoiHoc.getTietBatDau());
             values.put("tietKetThuc", buoiHoc.getTietKetThuc());
-            values.put("ghiChu", buoiHoc.getGhiChu());
 
             int result = db.update("BUOI_HOC", values, "id = ?",
                     new String[]{String.valueOf(buoiHoc.getId())});
@@ -147,13 +150,12 @@ public class BuoiHocDAO {
     }
 
     /**
-     * Xóa buổi học theo ID (HÀM MỚI THÊM ĐỂ HẾT LỖI)
+     * Xóa buổi học
      */
     public boolean delete(int id) {
         SQLiteDatabase db = databaseProvider.getWritableDatabase();
         try {
-            int result = db.delete("BUOI_HOC", "id = ?",
-                    new String[]{String.valueOf(id)});
+            int result = db.delete("BUOI_HOC", "id = ?", new String[]{String.valueOf(id)});
             return result > 0;
         } catch (Exception e) {
             AppLogger.e("BuoiHocDAO", "Error delete", e);
@@ -162,7 +164,8 @@ public class BuoiHocDAO {
     }
 
     /**
-     * Hàm dùng chung để chuyển dữ liệu từ Cursor sang Object BuoiHoc
+     * Chuyển Cursor -> BuoiHoc
+     * ĐÃ FIX LỖI: Xóa dòng lấy dữ liệu 'ghiChu' để khớp với bảng DB
      */
     private BuoiHoc extractBuoiHocFromCursor(Cursor cursor) {
         BuoiHoc bh = new BuoiHoc();
@@ -172,12 +175,14 @@ public class BuoiHocDAO {
         bh.setNgayHoc(cursor.getString(cursor.getColumnIndexOrThrow("ngayHoc")));
         bh.setTietBatDau(cursor.getInt(cursor.getColumnIndexOrThrow("tietBatDau")));
         bh.setTietKetThuc(cursor.getInt(cursor.getColumnIndexOrThrow("tietKetThuc")));
-        bh.setGhiChu(cursor.getString(cursor.getColumnIndexOrThrow("ghiChu")));
 
-        // Dữ liệu từ các bảng Join
+        // DÒNG DƯỚI ĐÂY ĐÃ BỊ XÓA VÌ TABLE KHÔNG CÓ CỘT ghiChu
+        // bh.setGhiChu(cursor.getString(cursor.getColumnIndexOrThrow("ghiChu")));
+
+        // Join bảng lấy tên
         bh.setTenMonHoc(cursor.getString(cursor.getColumnIndexOrThrow("tenMH")));
-        bh.setHoTenGV(cursor.getString(cursor.getColumnIndexOrThrow("hoTenGV")));
         bh.setTenLop(cursor.getString(cursor.getColumnIndexOrThrow("tenLop")));
+
         return bh;
     }
 }

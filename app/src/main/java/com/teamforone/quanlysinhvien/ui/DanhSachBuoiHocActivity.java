@@ -2,6 +2,7 @@ package com.teamforone.quanlysinhvien.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,16 +17,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.teamforone.quanlysinhvien.R;
-import com.teamforone.quanlysinhvien.data.dao.BuoiHocDAO;
 import com.teamforone.quanlysinhvien.domain.model.BuoiHoc;
 import com.teamforone.quanlysinhvien.domain.uiadapters.BuoiHocAdapter;
+import com.teamforone.quanlysinhvien.service.BuoiHocService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class DanhSachBuoiHocActivity extends AppCompatActivity {
+
+    private static final String TAG = "QUANLYSV_DEBUG";
 
     private RecyclerView recyclerView;
     private TextView tvEmpty;
@@ -34,19 +38,20 @@ public class DanhSachBuoiHocActivity extends AppCompatActivity {
     private FloatingActionButton fabAdd, fabHome;
 
     private BuoiHocAdapter adapter;
-    private List<BuoiHoc> buoiHocList;
+    private List<BuoiHoc> allBuoiHoc;
     private List<BuoiHoc> filteredList;
-    private BuoiHocDAO buoiHocDAO;
+
+    private BuoiHocService buoiHocService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_danh_sach_buoi_hoc);
 
+        // Đã lược bỏ phần phân quyền User/Role
         initViews();
         setupToolbar();
         setupRecyclerView();
-        loadData();
         setupListeners();
     }
 
@@ -58,8 +63,9 @@ public class DanhSachBuoiHocActivity extends AppCompatActivity {
         fabAdd = findViewById(R.id.fabAdd);
         fabHome = findViewById(R.id.fabHome);
 
-        buoiHocDAO = new BuoiHocDAO(this);
-        buoiHocList = new ArrayList<>();
+        buoiHocService = BuoiHocService.getInstance(this);
+
+        allBuoiHoc = new ArrayList<>();
         filteredList = new ArrayList<>();
     }
 
@@ -70,17 +76,17 @@ public class DanhSachBuoiHocActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("Danh Sách Buổi Học");
         }
-        toolbar.setNavigationOnClickListener(v -> onBackPressed());
+        toolbar.setNavigationOnClickListener(v -> finish());
     }
 
     private void setupRecyclerView() {
+        // Khởi tạo Adapter với filteredList (danh sách sẽ thay đổi khi lọc)
         adapter = new BuoiHocAdapter(this, filteredList, buoiHoc -> {
-            // Click vào item để đi tới màn hình Điểm danh
-            Intent intent = new Intent(DanhSachBuoiHocActivity.this, DiemDanhActivity.class);
+            // Khi bấm vào item sẽ chuyển sang màn hình điểm danh
+            Intent intent = new Intent(this, DiemDanhActivity.class);
             intent.putExtra("buoiHocId", buoiHoc.getId());
             intent.putExtra("tenMonHoc", buoiHoc.getTenMonHoc());
             intent.putExtra("tenLop", buoiHoc.getTenLop());
-            // ... có thể thêm các extra khác nếu cần
             startActivity(intent);
         });
 
@@ -89,36 +95,53 @@ public class DanhSachBuoiHocActivity extends AppCompatActivity {
     }
 
     private void loadData() {
-        // Lấy tất cả dữ liệu từ Database thông qua DAO
-        List<BuoiHoc> allFromDb = buoiHocDAO.getAllBuoiHoc();
+        // 1. Lấy dữ liệu từ database thông qua Service
+        List<BuoiHoc> data = buoiHocService.getAllBuoiHoc();
 
-        buoiHocList.clear();
-        if (allFromDb != null) {
-            for (BuoiHoc bh : allFromDb) {
-                if (bh.getId() > 0) buoiHocList.add(bh);
-            }
+        // 2. Debug Log: Kiểm tra xem Database có thực sự trả về dữ liệu không
+        if (data == null || data.isEmpty()) {
+            Log.e(TAG, "DỮ LIỆU TRỐNG: Hãy kiểm tra bảng BUOI_HOC, LOP và MONHOC!");
+        } else {
+            Log.d(TAG, "TÌM THẤY: " + data.size() + " buổi học.");
         }
 
-        filteredList.clear();
-        filteredList.addAll(buoiHocList);
+        allBuoiHoc.clear();
+        if (data != null) {
+            allBuoiHoc.addAll(data);
+        }
 
+        // 3. Mặc định hiển thị toàn bộ danh sách khi vừa vào
+        filteredList.clear();
+        filteredList.addAll(allBuoiHoc);
+
+        // 4. Cập nhật Spinner (dựa trên các lớp thực tế có trong data)
+        setupSpinner();
+
+        // 5. Cập nhật giao diện ẩn/hiện bảng
         updateUI();
-        setupSpinner(); // Cập nhật lại danh sách lọc ở Spinner
     }
 
     private void setupSpinner() {
         Set<String> lopSet = new HashSet<>();
         lopSet.add("Tất cả lớp");
-        for (BuoiHoc bh : buoiHocList) {
-            if (bh.getTenLop() != null) lopSet.add(bh.getTenLop());
+
+        // Chỉ thêm những lớp nào thực sự có buổi học
+        for (BuoiHoc bh : allBuoiHoc) {
+            if (bh.getTenLop() != null && !bh.getTenLop().isEmpty()) {
+                lopSet.add(bh.getTenLop());
+            }
         }
 
         List<String> lopNames = new ArrayList<>(lopSet);
+        Collections.sort(lopNames);
+
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, lopNames);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         spinnerLop.setAdapter(spinnerAdapter);
 
+        // Lắng nghe sự kiện chọn trên Spinner để lọc
         spinnerLop.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -129,13 +152,15 @@ public class DanhSachBuoiHocActivity extends AppCompatActivity {
         });
     }
 
-    private void filterByLop(String lopName) {
+    private void filterByLop(String lop) {
         filteredList.clear();
-        if (lopName.equals("Tất cả lớp")) {
-            filteredList.addAll(buoiHocList);
+        if ("Tất cả lớp".equals(lop)) {
+            filteredList.addAll(allBuoiHoc);
         } else {
-            for (BuoiHoc bh : buoiHocList) {
-                if (lopName.equals(bh.getTenLop())) filteredList.add(bh);
+            for (BuoiHoc bh : allBuoiHoc) {
+                if (lop.equals(bh.getTenLop())) {
+                    filteredList.add(bh);
+                }
             }
         }
         updateUI();
@@ -149,25 +174,30 @@ public class DanhSachBuoiHocActivity extends AppCompatActivity {
             recyclerView.setVisibility(View.VISIBLE);
             tvEmpty.setVisibility(View.GONE);
         }
+        // Báo cho Adapter biết dữ liệu đã thay đổi để vẽ lại màn hình
         adapter.notifyDataSetChanged();
     }
 
     private void setupListeners() {
+        // Nút reset bộ lọc
         btnResetFilter.setOnClickListener(v -> {
             spinnerLop.setSelection(0);
             filterByLop("Tất cả lớp");
         });
 
-        fabAdd.setOnClickListener(v -> {
-            startActivity(new Intent(this, TaoBuoiHocActivity.class));
-        });
+        // Nút nổi để mở trang tạo buổi học
+        fabAdd.setOnClickListener(v ->
+                startActivity(new Intent(this, TaoBuoiHocActivity.class))
+        );
 
+        // Nút về trang chủ/đóng
         fabHome.setOnClickListener(v -> finish());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        loadData(); // Load lại data mỗi khi quay lại từ màn hình thêm buổi học
+        // Quan trọng: Nạp lại dữ liệu mỗi khi quay lại màn hình này
+        loadData();
     }
 }
