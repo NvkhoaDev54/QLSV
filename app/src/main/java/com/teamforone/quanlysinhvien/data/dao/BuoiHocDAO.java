@@ -139,7 +139,6 @@ public class BuoiHocDAO {
             values.put("ngayHoc", buoiHoc.getNgayHoc());
             values.put("tietBatDau", buoiHoc.getTietBatDau());
             values.put("tietKetThuc", buoiHoc.getTietKetThuc());
-            // Đã xóa: values.put("ghiChu", buoiHoc.getGhiChu());
 
             int result = db.update("BUOI_HOC", values, "id = ?",
                     new String[]{String.valueOf(buoiHoc.getId())});
